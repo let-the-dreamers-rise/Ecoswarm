@@ -1,0 +1,25 @@
+{
+  "name": "ecoswarm-platform",
+  "version": "1.0.0",
+  "description": "EcoSwarm Regen - Hedera-native sustainability treasury",
+  "private": true,
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../ai-service && pip install -r requirements.txt && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:ai": "cd ai-service && python main.py",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:ai\" \"npm run dev:frontend\"",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "test": "npm run test:backend && npm run test:frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
