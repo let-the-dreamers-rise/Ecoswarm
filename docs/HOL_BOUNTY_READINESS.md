@@ -58,6 +58,12 @@ Reason:
 - HOL ledger authentication succeeded
 - HOL registration quote succeeded
 - public agent card now resolves correctly through a public Cloudflare quick tunnel
+- the original team account was verified against the Hedera testnet mirror node:
+  - account: `0.0.8188944`
+  - key type: `ECDSA_SECP256K1`
+  - public key matches the supplied private key
+  - EVM address matches `0x1f951702d835b7658498003fe3bbe97090df81c0`
+- a fresh ED25519 testnet account was also created only for HOL registration retries
 - quote result:
   - `requiredCredits: 0`
   - `shortfallCredits: 0`
@@ -77,9 +83,11 @@ That means:
 - the public agent card is not the blocker
 - HOL auth is not the blocker
 - quote generation is not the blocker
-- the broker host is timing out during `registerAgent`
+- the broker host is unstable during `registerAgent`
+- when the broker falls back into HOL credit purchase, it returns `INVALID_SIGNATURE` even on a fresh ED25519 account
 
 An earlier `INVALID_SIGNATURE` error during credit purchase was traced to raw `0x...` ECDSA key formatting and fixed by normalizing the key before sending it to the broker.
+That fix was not sufficient to resolve the broker-side purchase path. The same class of failure reproduced after retrying with a fresh ED25519 account, which strongly suggests the remaining issue is outside this repo.
 
 ## Honest Submission Strategy
 

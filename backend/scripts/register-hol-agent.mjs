@@ -46,7 +46,17 @@ function normalizeHederaPrivateKey(privateKey) {
 
   return privateKey.startsWith('0x')
     ? PrivateKey.fromStringECDSA(privateKey).toString()
-    : privateKey;
+    : PrivateKey.fromString(privateKey).toString();
+}
+
+function toBrokerPurchasePrivateKey(privateKey) {
+  if (!privateKey) {
+    return privateKey;
+  }
+
+  return privateKey.startsWith('0x')
+    ? PrivateKey.fromStringECDSA(privateKey).toStringRaw()
+    : PrivateKey.fromString(privateKey).toStringRaw();
 }
 
 function getCanonicalNetwork(network) {
@@ -150,20 +160,9 @@ function buildRegistrationPayload(publicBaseUrl) {
 }
 
 function buildClient() {
-  const accountId = process.env.HEDERA_ACCOUNT_ID;
-  const privateKey = normalizeHederaPrivateKey(process.env.HEDERA_PRIVATE_KEY);
-
   return new RegistryBrokerClient({
     baseUrl: process.env.REGISTRY_BROKER_BASE_URL || DEFAULT_BROKER_BASE_URL,
-    apiKey: process.env.REGISTRY_BROKER_API_KEY || undefined,
-    registrationAutoTopUp:
-      accountId && privateKey
-        ? {
-            accountId,
-            privateKey,
-            memo: 'ecoswarm-hol-auto-topup'
-          }
-        : undefined
+    apiKey: process.env.REGISTRY_BROKER_API_KEY || undefined
   });
 }
 
@@ -284,8 +283,9 @@ async function registerWithAutoTopUp(client, payload) {
     const shortfall = extractCreditShortfall(error);
     const accountId = process.env.HEDERA_ACCOUNT_ID;
     const privateKey = normalizeHederaPrivateKey(process.env.HEDERA_PRIVATE_KEY);
+    const purchasePrivateKey = toBrokerPurchasePrivateKey(process.env.HEDERA_PRIVATE_KEY);
 
-    if (!shortfall || !accountId || !privateKey) {
+    if (!shortfall || !accountId || !privateKey || !purchasePrivateKey) {
       throw error;
     }
 
@@ -306,7 +306,7 @@ async function registerWithAutoTopUp(client, payload) {
     const purchase = await withBrokerRetries('purchaseCreditsWithHbar', () =>
       client.purchaseCreditsWithHbar({
         accountId,
-        privateKey,
+        privateKey: purchasePrivateKey,
         hbarAmount,
         memo: 'ecoswarm-hol-registration',
         metadata: {
