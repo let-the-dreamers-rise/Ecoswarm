@@ -69,6 +69,7 @@ Practical conclusion:
 
 - HOL ledger authentication succeeded
 - HOL registration quote succeeded
+- broker API-key authentication also succeeded
 - public agent card now resolves correctly through a public Cloudflare quick tunnel
 - the original team account was verified against the Hedera testnet mirror node:
   - account: `0.0.8188944`
@@ -94,12 +95,14 @@ That means:
 - local app logic is not the blocker
 - the public agent card is not the blocker
 - HOL auth is not the blocker
+- API-key auth is not the blocker
 - quote generation is not the blocker
 - the broker host is unstable during `registerAgent`
 - when the broker falls back into HOL credit purchase, it returns `INVALID_SIGNATURE` even on a fresh ED25519 account
 
 An earlier `INVALID_SIGNATURE` error during credit purchase was traced to raw `0x...` ECDSA key formatting and fixed by normalizing the key before sending it to the broker.
 That fix was not sufficient to resolve the broker-side purchase path. The same class of failure reproduced after retrying with a fresh ED25519 account, which strongly suggests the remaining issue is outside this repo.
+Finally, a direct API-key registration attempt removed ledger authentication from the flow entirely and still failed with a hosted `504 Gateway Timeout`, which confirms the remaining blocker is the broker host rather than local signing code.
 
 ## Honest Submission Strategy
 
