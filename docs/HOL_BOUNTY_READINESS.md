@@ -49,22 +49,24 @@ Reason:
 - `backend/scripts/register-hol-agent.mjs` now supports:
   - ledger-based HOL auth using the current Hedera account
   - quote-only mode
-  - temporary public exposure through `localtunnel`
-  - full registration attempts
+  - broker retry handling for temporary `400 fetch failed`, `503`, and `504` responses
+  - normalized ECDSA private-key handling for HOL auth and credit-purchase flows
+  - full registration attempts against an explicit public URL
 
 ### Verified on March 21, 2026
 
 - HOL ledger authentication succeeded
 - HOL registration quote succeeded
+- public agent card now resolves correctly through a public Cloudflare quick tunnel
 - quote result:
   - `requiredCredits: 0`
   - `shortfallCredits: 0`
 
 ## What Still Blocks Final HOL Submission
 
-The code is ready. The weak point is the public endpoint.
+The code is ready. The remaining blocker is the HOL broker host.
 
-When registration was attempted through a temporary `localtunnel` URL, the broker returned:
+When registration was attempted through a public Cloudflare quick tunnel URL, the broker returned:
 
 - `504 Gateway Timeout`
 - host error at `registry.hashgraphonline.com`
@@ -72,9 +74,12 @@ When registration was attempted through a temporary `localtunnel` URL, the broke
 That means:
 
 - local app logic is not the blocker
+- the public agent card is not the blocker
 - HOL auth is not the blocker
 - quote generation is not the blocker
-- stable public hosting is the missing piece for a reliable final registration path
+- the broker host is timing out during `registerAgent`
+
+An earlier `INVALID_SIGNATURE` error during credit purchase was traced to raw `0x...` ECDSA key formatting and fixed by normalizing the key before sending it to the broker.
 
 ## Honest Submission Strategy
 
@@ -86,7 +91,7 @@ That means:
 
 - submit `Hashgraph Online` only if both are true before deadline:
   - the backend is on a stable public URL
-  - HOL registration succeeds against that stable URL
+  - HOL registration succeeds when the broker host is healthy
 
 ### Do not submit
 
@@ -97,13 +102,15 @@ That means:
 ### Quote only
 
 ```bash
-npm run register:hol --prefix backend -- --quote-only --open-tunnel
+$env:HOL_AGENT_PUBLIC_URL='https://<public-backend-url>'
+npm run register:hol --prefix backend -- --quote-only
 ```
 
 ### Full registration attempt
 
 ```bash
-npm run register:hol --prefix backend -- --open-tunnel
+$env:HOL_AGENT_PUBLIC_URL='https://<public-backend-url>'
+npm run register:hol --prefix backend
 ```
 
 ### Recommended stable-host version
@@ -114,8 +121,20 @@ npm run register:hol --prefix backend
 
 Use the stable-host version only after setting `HOL_AGENT_PUBLIC_URL` to a real public backend URL.
 
+### Temporary public tunnel helper
+
+```powershell
+powershell -ExecutionPolicy Bypass -File backend/scripts/launch-cloudflared.ps1
+```
+
+Then read the generated hostname from:
+
+```powershell
+Get-Content .codex-runtime/cloudflared.log
+```
+
 ## Recommendation
 
 If a stable deployment is available before submission, include the `Hashgraph Online` bounty.
 
-If not, submit only `Sustainability`.
+If the broker keeps returning `504`, submit only `Sustainability`.

@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { config as loadEnv } from 'dotenv';
+import { PrivateKey } from '@hashgraph/sdk';
 import localtunnel from 'localtunnel';
 import {
   AIAgentCapability,
@@ -20,6 +21,9 @@ loadEnv({ path: path.resolve(__dirname, '../.env') });
 
 const DEFAULT_BROKER_BASE_URL = 'https://hol.org/registry/api/v1';
 const DEFAULT_AGENT_DISPLAY_NAME = 'EcoSwarm Regen Operator';
+const DEFAULT_CREDITS_PER_HBAR = 9;
+const DEFAULT_BROKER_RETRY_ATTEMPTS = 4;
+const DEFAULT_BROKER_RETRY_DELAY_MS = 3000;
 
 function hasFlag(flag) {
   return process.argv.includes(flag);
@@ -27,6 +31,22 @@ function hasFlag(flag) {
 
 function normalizePublicBaseUrl(url) {
   return url.replace(/\/+$/, '');
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+function normalizeHederaPrivateKey(privateKey) {
+  if (!privateKey) {
+    return privateKey;
+  }
+
+  return privateKey.startsWith('0x')
+    ? PrivateKey.fromStringECDSA(privateKey).toString()
+    : privateKey;
 }
 
 function getCanonicalNetwork(network) {
@@ -131,7 +151,7 @@ function buildRegistrationPayload(publicBaseUrl) {
 
 function buildClient() {
   const accountId = process.env.HEDERA_ACCOUNT_ID;
-  const privateKey = process.env.HEDERA_PRIVATE_KEY;
+  const privateKey = normalizeHederaPrivateKey(process.env.HEDERA_PRIVATE_KEY);
 
   return new RegistryBrokerClient({
     baseUrl: process.env.REGISTRY_BROKER_BASE_URL || DEFAULT_BROKER_BASE_URL,
@@ -153,24 +173,26 @@ async function authenticateClient(client) {
   }
 
   const accountId = process.env.HEDERA_ACCOUNT_ID;
-  const privateKey = process.env.HEDERA_PRIVATE_KEY;
+  const privateKey = normalizeHederaPrivateKey(process.env.HEDERA_PRIVATE_KEY);
 
   if (!accountId || !privateKey) {
     throw new Error('Set REGISTRY_BROKER_API_KEY or provide HEDERA_ACCOUNT_ID and HEDERA_PRIVATE_KEY for ledger authentication.');
   }
 
-  await client.authenticateWithLedgerCredentials({
-    accountId,
-    network: getCanonicalNetwork(process.env.HEDERA_NETWORK || 'testnet'),
-    hederaPrivateKey: privateKey,
-    expiresInMinutes: 10,
-    setAccountHeader: true,
-    label: 'ecoswarm-hol-registration',
-    logger: {
-      info: (message) => console.log(`[HOL auth] ${message}`),
-      warn: (message) => console.warn(`[HOL auth] ${message}`)
-    }
-  });
+  await withBrokerRetries('authenticateWithLedgerCredentials', () =>
+    client.authenticateWithLedgerCredentials({
+      accountId,
+      network: getCanonicalNetwork(process.env.HEDERA_NETWORK || 'testnet'),
+      hederaPrivateKey: privateKey,
+      expiresInMinutes: 10,
+      setAccountHeader: true,
+      label: 'ecoswarm-hol-registration',
+      logger: {
+        info: (message) => console.log(`[HOL auth] ${message}`),
+        warn: (message) => console.warn(`[HOL auth] ${message}`)
+      }
+    })
+  );
 
   return 'ledger-auth';
 }
@@ -199,44 +221,101 @@ function extractCreditShortfall(error) {
   }
 
   return {
-    requiredCredits: Number(body.requiredCredits || 0),
-    shortfallCredits: Number(body.shortfallCredits || 0),
-    estimatedHbar: Number(body.estimatedHbar || 0),
-    creditsPerHbar: Number(body.creditsPerHbar || 0)
+    requiredCredits: Number.isFinite(Number(body.requiredCredits)) ? Number(body.requiredCredits) : 0,
+    shortfallCredits: Number.isFinite(Number(body.shortfallCredits)) ? Number(body.shortfallCredits) : 0,
+    estimatedHbar: Number.isFinite(Number(body.estimatedHbar)) ? Number(body.estimatedHbar) : 0,
+    creditsPerHbar: Number.isFinite(Number(body.creditsPerHbar)) ? Number(body.creditsPerHbar) : 0
   };
+}
+
+function isRetriableBrokerError(error) {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const status = Number(error.status || 0);
+  const bodyError =
+    typeof error.body?.error === 'string' ? error.body.error.toLowerCase() : '';
+  const message =
+    typeof error.message === 'string' ? error.message.toLowerCase() : '';
+
+  if ([502, 503, 504].includes(status)) {
+    return true;
+  }
+
+  return (
+    (status === 400 && bodyError.includes('fetch failed')) ||
+    (status === 400 && message.includes('fetch failed')) ||
+    bodyError.includes('temporarily unavailable') ||
+    bodyError.includes('gateway timeout') ||
+    message.includes('temporarily unavailable') ||
+    message.includes('gateway timeout')
+  );
+}
+
+async function withBrokerRetries(label, operation, attempts = DEFAULT_BROKER_RETRY_ATTEMPTS) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+
+      if (!isRetriableBrokerError(error) || attempt === attempts) {
+        throw error;
+      }
+
+      const delayMs = DEFAULT_BROKER_RETRY_DELAY_MS * attempt;
+      console.warn(
+        `[HOL broker] ${label} failed with ${error.status || 'unknown'} on attempt ${attempt}/${attempts}. Retrying in ${delayMs}ms.`
+      );
+      await sleep(delayMs);
+    }
+  }
+
+  throw lastError;
 }
 
 async function registerWithAutoTopUp(client, payload) {
   try {
-    return await client.registerAgent(payload);
+    return await withBrokerRetries('registerAgent', () => client.registerAgent(payload));
   } catch (error) {
     const shortfall = extractCreditShortfall(error);
     const accountId = process.env.HEDERA_ACCOUNT_ID;
-    const privateKey = process.env.HEDERA_PRIVATE_KEY;
+    const privateKey = normalizeHederaPrivateKey(process.env.HEDERA_PRIVATE_KEY);
 
     if (!shortfall || !accountId || !privateKey) {
       throw error;
     }
 
-    const hbarAmount = Number(
-      Math.max(shortfall.estimatedHbar || 0, shortfall.shortfallCredits / Math.max(shortfall.creditsPerHbar || 1, 1)) + 0.1
-    .toFixed(8));
+    const creditsPerHbar =
+      shortfall.creditsPerHbar > 0 ? shortfall.creditsPerHbar : DEFAULT_CREDITS_PER_HBAR;
+    const estimatedHbar =
+      shortfall.estimatedHbar > 0
+        ? shortfall.estimatedHbar
+        : shortfall.shortfallCredits > 0
+          ? shortfall.shortfallCredits / creditsPerHbar
+          : 1;
+    const hbarAmount = Number((Math.max(estimatedHbar, 1) + 0.1).toFixed(8));
 
     console.log(
       `Insufficient HOL credits detected. Purchasing ${shortfall.shortfallCredits} credits with ${hbarAmount} HBAR.`
     );
 
-    const purchase = await client.purchaseCreditsWithHbar({
-      accountId,
-      privateKey,
-      hbarAmount,
-      memo: 'ecoswarm-hol-registration',
-      metadata: {
-        reason: 'hol-agent-registration',
-        requiredCredits: shortfall.requiredCredits,
-        shortfallCredits: shortfall.shortfallCredits
-      }
-    });
+    const purchase = await withBrokerRetries('purchaseCreditsWithHbar', () =>
+      client.purchaseCreditsWithHbar({
+        accountId,
+        privateKey,
+        hbarAmount,
+        memo: 'ecoswarm-hol-registration',
+        metadata: {
+          reason: 'hol-agent-registration',
+          requiredCredits: shortfall.requiredCredits,
+          shortfallCredits: shortfall.shortfallCredits
+        }
+      })
+    );
 
     console.log(
       JSON.stringify(
@@ -248,8 +327,7 @@ async function registerWithAutoTopUp(client, payload) {
         2
       )
     );
-
-    return client.registerAgent(payload);
+    return withBrokerRetries('registerAgent', () => client.registerAgent(payload));
   }
 }
 
@@ -284,7 +362,9 @@ async function main() {
     console.log(`Agent card reachable at ${agentCardUrl}.`);
     console.log(`Agent card name: ${agentCard.name}`);
 
-    const quote = await client.getRegistrationQuote(payload);
+    const quote = await withBrokerRetries('getRegistrationQuote', () =>
+      client.getRegistrationQuote(payload)
+    );
     console.log('Registration quote:');
     printQuoteSummary(quote);
 
@@ -307,7 +387,8 @@ async function main() {
       ) {
         console.log(`Registration is ${registration.status}. Waiting for completion...`);
 
-        const final = await client.waitForRegistrationCompletion(registration.attemptId, {
+        const final = await withBrokerRetries('waitForRegistrationCompletion', () =>
+          client.waitForRegistrationCompletion(registration.attemptId, {
           intervalMs: 2000,
           timeoutMs: 5 * 60 * 1000,
           throwOnFailure: true,
@@ -316,13 +397,14 @@ async function main() {
               `[HOL registration] ${progress.status} ${progress.progressPercent ?? 0}% ${progress.message || ''}`.trim()
             );
           }
-        });
+          })
+        );
 
         if (!final.uaid) {
           throw new Error(`Registration finished without a UAID. Final status: ${final.status}`);
         }
 
-        const resolved = await client.resolveUaid(final.uaid);
+        const resolved = await withBrokerRetries('resolveUaid', () => client.resolveUaid(final.uaid));
 
         console.log(
           JSON.stringify(

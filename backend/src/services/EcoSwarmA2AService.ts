@@ -1,4 +1,4 @@
-import type { Express } from 'express';
+import type { Express, Request } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import type { AgentCard, Message, Part } from '@a2a-js/sdk';
 import { AGENT_CARD_PATH } from '@a2a-js/sdk';
@@ -10,7 +10,6 @@ import {
   type RequestContext
 } from '@a2a-js/sdk/server';
 import {
-  agentCardHandler,
   jsonRpcHandler,
   restHandler,
   UserBuilder
@@ -59,19 +58,20 @@ export interface MountedA2AAgent {
   agentCard: AgentCard;
 }
 
-export function mountEcoSwarmA2AService(
-  app: Express,
-  agentService: EcoSwarmAgentService,
-  publicBaseUrl: string
-): MountedA2AAgent {
-  const baseUrl = publicBaseUrl.replace(/\/+$/, '');
-  const agentCard: AgentCard = {
+function normalizeBaseUrl(baseUrl: string): string {
+  return baseUrl.replace(/\/+$/, '');
+}
+
+function buildAgentCard(baseUrl: string): AgentCard {
+  const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
+
+  return {
     name: 'EcoSwarm Regen Operator',
     description:
       'A sustainability treasury operator agent that can summarize live payout cases, explain the deployment wedge, and advance verifier review, release authorization, or tranche settlement.',
     protocolVersion: '0.3.0',
     version: '0.1.0',
-    url: `${baseUrl}/a2a`,
+    url: `${normalizedBaseUrl}/a2a`,
     skills: [
       {
         id: 'ecoswarm-case-operations',
@@ -94,15 +94,41 @@ export function mountEcoSwarmA2AService(
     defaultOutputModes: ['text'],
     additionalInterfaces: [
       {
-        url: `${baseUrl}/a2a`,
+        url: `${normalizedBaseUrl}/a2a`,
         transport: 'JSONRPC'
       },
       {
-        url: `${baseUrl}/a2a/rest`,
+        url: `${normalizedBaseUrl}/a2a/rest`,
         transport: 'HTTP+JSON'
       }
     ]
   };
+}
+
+function resolvePublicBaseUrl(req: Request, configuredPublicBaseUrl: string | null): string {
+  if (configuredPublicBaseUrl) {
+    return normalizeBaseUrl(configuredPublicBaseUrl);
+  }
+
+  const forwardedProtoHeader = req.get('x-forwarded-proto');
+  const forwardedHostHeader = req.get('x-forwarded-host');
+  const protocol = forwardedProtoHeader?.split(',')[0]?.trim() || req.protocol || 'http';
+  const host = forwardedHostHeader?.split(',')[0]?.trim() || req.get('host');
+
+  if (!host) {
+    throw new Error('Unable to resolve public host for agent card.');
+  }
+
+  return `${protocol}://${host}`;
+}
+
+export function mountEcoSwarmA2AService(
+  app: Express,
+  agentService: EcoSwarmAgentService,
+  publicBaseUrl: string
+): MountedA2AAgent {
+  const configuredBaseUrl = publicBaseUrl.trim() ? normalizeBaseUrl(publicBaseUrl) : null;
+  const agentCard = buildAgentCard(configuredBaseUrl || 'http://localhost:3000');
 
   const requestHandler = new DefaultRequestHandler(
     agentCard,
@@ -110,9 +136,11 @@ export function mountEcoSwarmA2AService(
     new EcoSwarmA2AExecutor(agentService)
   );
 
-  app.use(`/${AGENT_CARD_PATH}`, agentCardHandler({ agentCardProvider: requestHandler }));
-  app.get('/.well-known/agent.json', (_req, res) => {
-    res.json(agentCard);
+  app.get(`/${AGENT_CARD_PATH}`, (req, res) => {
+    res.json(buildAgentCard(resolvePublicBaseUrl(req, configuredBaseUrl)));
+  });
+  app.get('/.well-known/agent.json', (req, res) => {
+    res.json(buildAgentCard(resolvePublicBaseUrl(req, configuredBaseUrl)));
   });
   app.use('/a2a', jsonRpcHandler({ requestHandler, userBuilder: UserBuilder.noAuthentication }));
   app.use('/a2a/rest', restHandler({ requestHandler, userBuilder: UserBuilder.noAuthentication }));

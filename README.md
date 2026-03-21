@@ -168,20 +168,23 @@ EcoSwarm now includes a real HOL-targeted agent surface:
 To generate a HOL quote using the current Hedera credentials and a temporary public tunnel:
 
 ```bash
-npm run register:hol --prefix backend -- --quote-only --open-tunnel
+$env:HOL_AGENT_PUBLIC_URL='https://<public-backend-url>'
+npm run register:hol --prefix backend -- --quote-only
 ```
 
 To attempt a full registration:
 
 ```bash
-npm run register:hol --prefix backend -- --open-tunnel
+$env:HOL_AGENT_PUBLIC_URL='https://<public-backend-url>'
+npm run register:hol --prefix backend
 ```
 
 Current honest status:
 
 - HOL auth works
 - HOL quote works
-- final registration still needs a stable public backend URL for a reliable submission path
+- the public agent card works on a real public tunnel URL
+- final registration is currently blocked by intermittent `504 Gateway Timeout` responses from `registry.hashgraphonline.com`
 
 See `docs/HOL_BOUNTY_READINESS.md` for the exact go / no-go call on the bounty.
 

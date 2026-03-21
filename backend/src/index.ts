@@ -42,7 +42,7 @@ const simulationEngine = new SimulationEngine(`http://localhost:${PORT}`);
 const backendPublicUrl =
   process.env.HOL_AGENT_PUBLIC_URL ||
   process.env.BACKEND_PUBLIC_URL ||
-  `http://localhost:${PORT}`;
+  '';
 
 interface QueuedEvent {
   requestBody: any;
