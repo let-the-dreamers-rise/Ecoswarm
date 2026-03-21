@@ -14,6 +14,18 @@ Reason:
 - HOL ledger authentication and registration quoting work with the current Hedera testnet account
 - OpenClaw still needs protocol-specific agent-commerce or UCP-level behavior, not just an agent-themed UI
 
+## Current Doc Read
+
+As of March 21, 2026, the current HOL Registry Broker client docs describe the hosted production broker as `pay-as-you-go` and state that metered endpoints such as `agent registration` require an active credit balance from the billing portal.
+
+At the same time, older HOL example docs still mention a complimentary allowance for the first few base registrations.
+
+Practical conclusion:
+
+- discovery is definitely free
+- registration behavior on the hosted broker currently behaves like a metered path
+- do not assume the older complimentary-registration wording will hold during submission
+
 ## What Is Already Working
 
 ### Product surface
