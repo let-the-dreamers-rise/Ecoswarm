@@ -5,6 +5,8 @@ export type UrgencyLevel = 'stable' | 'elevated' | 'critical';
 export type ReleaseReadiness = 'hold' | 'review' | 'release';
 export type MilestoneStage = 'proof_intake' | 'verifier_review' | 'committee_review' | 'release_ready';
 export type MilestoneStatus = 'pending' | 'ready' | 'released';
+export type RoleAccountType = 'sponsor' | 'verifier' | 'operator';
+export type OnChainStepStatus = 'completed' | 'failed' | 'skipped';
 export type CaseActionType =
   | 'proof_packet_locked'
   | 'verifier_review_requested'
@@ -31,6 +33,60 @@ export interface CaseAction {
   note: string;
   timestamp: string;
   transaction_id?: string;
+  required_steps?: OnChainActionStep[];
+  optional_steps?: OnChainActionStep[];
+  failure_reason?: string;
+}
+
+export interface OnChainActionStep {
+  key:
+    | 'contract_project_created'
+    | 'escrow_funded'
+    | 'milestone_approved'
+    | 'milestone_released'
+    | 'refund_after_deadline'
+    | 'hcs_recorded'
+    | 'hts_receipt_transferred'
+    | 'impact_certificate_minted';
+  label: string;
+  status: OnChainStepStatus;
+  transaction_id?: string;
+  detail?: string;
+}
+
+export interface RoleAccountBinding {
+  role: RoleAccountType;
+  account_id: string;
+  solidity_address: string;
+  created_at: string;
+  transaction_id?: string;
+}
+
+export interface EscrowMilestoneState {
+  index: number;
+  label: string;
+  amount_tinybar: number;
+  deadline_at: string;
+  approved_at?: string;
+  released_at?: string;
+  refund_tx_id?: string;
+}
+
+export interface OnChainProjectStatus {
+  network: string;
+  escrow_contract_id?: string;
+  contract_project_created: boolean;
+  escrow_funded: boolean;
+  escrow_transaction_id?: string;
+  contract_project_transaction_id?: string;
+  deadline_reminder_schedule_id?: string;
+  deadline_reminder_tx_id?: string;
+  escrow_total_hbar: number;
+  escrow_total_tinybar: number;
+  released_hbar: number;
+  refund_eligible: boolean;
+  last_failure_reason?: string;
+  milestones: EscrowMilestoneState[];
 }
 
 export interface DeploymentBlueprintStep {
@@ -82,6 +138,8 @@ export interface DeploymentProfile {
   released_capital_usd: number;
   next_action_label: string;
   case_actions: CaseAction[];
+  role_accounts?: Record<RoleAccountType, RoleAccountBinding>;
+  on_chain_status?: OnChainProjectStatus;
 }
 
 export interface SustainabilityMetadata {
@@ -122,6 +180,17 @@ export interface SubmitEventResponse {
   hedera_transaction_id?: string;
 }
 
+export interface SubmitCaseActionResponse {
+  success: boolean;
+  event_id: string;
+  action_type: CaseActionType;
+  transaction_id?: string;
+  required_steps: OnChainActionStep[];
+  optional_steps: OnChainActionStep[];
+  transaction_ids: string[];
+  failure_reason?: string;
+}
+
 export interface PortfolioResponse {
   allocations: {
     Solar: number;
@@ -150,6 +219,7 @@ export interface MetricsResponse {
   active_regions?: string[];
   active_sponsors?: string[];
   active_verifiers?: string[];
+  accounts_created?: number;
 }
 
 export interface TokenBalancesResponse {

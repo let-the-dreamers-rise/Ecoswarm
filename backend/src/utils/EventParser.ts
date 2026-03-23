@@ -104,6 +104,7 @@ export function parseEventFromJSON(input: string | object): EnvironmentalEvent {
 
   // Create SubmitEventRequest object
   const eventRequest: SubmitEventRequest = {
+    id: data.id,
     event_type: data.event_type,
     location_coordinates: {
       latitude: data.location_coordinates.latitude,
@@ -129,7 +130,10 @@ export function parseEventFromJSON(input: string | object): EnvironmentalEvent {
     verifier_name: data.verifier_name,
     local_operator_name: data.local_operator_name,
     buyer_signal: data.buyer_signal,
-    beneficiary_metric: data.beneficiary_metric
+    beneficiary_metric: data.beneficiary_metric,
+    impact_score: data.impact_score,
+    priority_score: data.priority_score,
+    deployment_profile: data.deployment_profile
   };
 
   // Create and return EnvironmentalEvent

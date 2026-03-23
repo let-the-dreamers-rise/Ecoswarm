@@ -7,6 +7,7 @@ import type {
   MetricsResponse,
   OptimizeResponse,
   PortfolioResponse,
+  SubmitCaseActionResponse,
   SystemHealthUpdate,
   TokenBalancesResponse
 } from '../types';
@@ -392,20 +393,31 @@ export function useTreasuryLiveData(wsUrl: string) {
         })
       });
 
+      const payload = await response.json() as SubmitCaseActionResponse | { error?: string };
+
       if (!response.ok) {
-        throw new Error(`Case action failed with status ${response.status}`);
+        throw new Error(
+          'error' in payload && payload.error
+            ? payload.error
+            : `Case action failed with status ${response.status}`
+        );
       }
 
-      showNotification(
-        actionType === 'verifier_review_requested'
-          ? 'Verifier review requested'
-          : actionType === 'sponsor_release_authorized'
-            ? 'Sponsor release authorized'
-            : 'Tranche released'
-      );
+      const result = payload as SubmitCaseActionResponse;
+      if (result.failure_reason) {
+        showNotification(result.failure_reason);
+      } else {
+        showNotification(
+          actionType === 'verifier_review_requested'
+            ? 'Verifier review requested'
+            : actionType === 'sponsor_release_authorized'
+              ? 'Sponsor release authorized'
+              : 'Tranche released'
+        );
+      }
     } catch (error) {
       console.error('Failed to run case action:', error);
-      showNotification('Case action failed');
+      showNotification(error instanceof Error ? error.message : 'Case action failed');
     } finally {
       setActiveCaseAction(null);
     }

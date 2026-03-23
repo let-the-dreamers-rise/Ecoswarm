@@ -168,7 +168,7 @@ describe('Dashboard Component', () => {
     await waitFor(() => {
       expect(screen.getByText('100')).toBeInTheDocument();
       expect(screen.getByText('75')).toBeInTheDocument();
-      expect(screen.getByText('50')).toBeInTheDocument();
+      expect(screen.getAllByText('50').length).toBeGreaterThan(0);
     });
   });
 

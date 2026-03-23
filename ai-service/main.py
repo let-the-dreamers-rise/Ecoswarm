@@ -166,6 +166,138 @@ async def optimize(request: OptimizeRequest) -> OptimizeResponse:
         rebalancing_needed=True
     )
 
+# ──────────────── Gemini LLM Analysis Endpoint ────────────────
+
+class AnalyzeRequest(BaseModel):
+    project_name: str
+    event_type: str
+    impact_score: float = 0.0
+    urgency_level: str = "stable"
+    verification_confidence: float = 0.0
+    households_supported: int = 0
+    cost_per_impact_unit_usd: float = 1.0
+    release_readiness: str = "hold"
+    payout_recommendation_usd: float = 0.0
+    proof_hash: str = ""
+    sponsor_name: str = ""
+    verifier_name: str = ""
+    local_operator_name: str = ""
+    risk_flags: list = []
+    location_label: str = ""
+
+class AnalyzeResponse(BaseModel):
+    risk_assessment: str
+    impact_analysis: str
+    funding_recommendation: str
+    confidence_score: float
+    key_considerations: list
+    ai_model: str
+    generated_at: str
+
+def build_analysis_prompt(req: AnalyzeRequest) -> str:
+    return f"""You are a climate finance analyst evaluating a sustainability project for milestone-based funding release.
+
+PROJECT DETAILS:
+- Name: {req.project_name}
+- Type: {req.event_type}
+- Location: {req.location_label}
+- Impact Score: {req.impact_score}/100
+- Urgency Level: {req.urgency_level}
+- Verification Confidence: {req.verification_confidence * 100:.0f}%
+- Households Supported: {req.households_supported}
+- Cost per Impact Unit: ${req.cost_per_impact_unit_usd}
+- Release Readiness: {req.release_readiness}
+- Payout Recommendation: ${req.payout_recommendation_usd:,.0f}
+- Sponsor: {req.sponsor_name or 'Not assigned'}
+- Verifier: {req.verifier_name or 'Not assigned'}
+- Local Operator: {req.local_operator_name or 'Not assigned'}
+- Proof Hash: {req.proof_hash or 'None'}
+- Risk Flags: {', '.join(req.risk_flags) if req.risk_flags else 'None'}
+
+Provide your analysis in EXACTLY this JSON format (no markdown, no code blocks):
+{{
+  "risk_assessment": "2-3 sentence risk assessment of this project for funding release",
+  "impact_analysis": "2-3 sentence analysis of the environmental and social impact potential",
+  "funding_recommendation": "Clear recommendation: APPROVE, HOLD, or REJECT with 1-2 sentence justification",
+  "confidence_score": 0.85,
+  "key_considerations": ["consideration 1", "consideration 2", "consideration 3"]
+}}"""
+
+
+@app.post("/analyze")
+async def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
+    """
+    Use Gemini LLM to produce a qualitative risk assessment, impact analysis,
+    and funding recommendation for a sustainability project case.
+    Falls back to rule-based analysis if Gemini API key is not available.
+    """
+    import json
+    from datetime import datetime
+
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    ai_model = "gemini-2.0-flash"
+
+    if gemini_key:
+        try:
+            from google import genai
+
+            client = genai.Client(api_key=gemini_key)
+            prompt = build_analysis_prompt(request)
+
+            response = client.models.generate_content(
+                model=ai_model,
+                contents=prompt
+            )
+
+            raw = response.text.strip()
+            # Strip markdown code fences if present
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+            if raw.endswith("```"):
+                raw = raw[:-3]
+            raw = raw.strip()
+
+            parsed = json.loads(raw)
+
+            return AnalyzeResponse(
+                risk_assessment=parsed.get("risk_assessment", "Analysis unavailable"),
+                impact_analysis=parsed.get("impact_analysis", "Analysis unavailable"),
+                funding_recommendation=parsed.get("funding_recommendation", "HOLD — insufficient data"),
+                confidence_score=float(parsed.get("confidence_score", 0.5)),
+                key_considerations=parsed.get("key_considerations", []),
+                ai_model=ai_model,
+                generated_at=datetime.utcnow().isoformat() + "Z"
+            )
+        except Exception as e:
+            print(f"[AI] Gemini analysis failed, falling back to rule-based: {e}")
+
+    # ── Rule-based fallback ──
+    risk_level = "LOW"
+    if request.risk_flags:
+        risk_level = "HIGH" if len(request.risk_flags) >= 2 else "MEDIUM"
+
+    rec = "APPROVE" if request.release_readiness == "release" and request.verification_confidence > 0.7 else "HOLD"
+
+    return AnalyzeResponse(
+        risk_assessment=f"Project {request.project_name} has {risk_level} risk based on {len(request.risk_flags)} flag(s). "
+                        f"Verification confidence is {request.verification_confidence * 100:.0f}%. "
+                        f"{'Urgency is elevated, requiring faster review.' if request.urgency_level != 'stable' else 'Standard review timeline applies.'}",
+        impact_analysis=f"This {request.event_type} project supports {request.households_supported} households at "
+                        f"${request.cost_per_impact_unit_usd}/impact unit. Impact score of {request.impact_score:.1f}/100 "
+                        f"{'exceeds the portfolio average' if request.impact_score > 50 else 'is below the portfolio average'}.",
+        funding_recommendation=f"{rec} — {'Release readiness confirmed with strong verification' if rec == 'APPROVE' else 'Awaiting higher verification confidence or release readiness upgrade'}.",
+        confidence_score=min(request.verification_confidence * 0.8 + 0.2, 1.0),
+        key_considerations=[
+            f"Verification confidence: {request.verification_confidence * 100:.0f}%",
+            f"Risk flags: {len(request.risk_flags)}",
+            f"Cost efficiency: ${request.cost_per_impact_unit_usd}/unit",
+            f"Community reach: {request.households_supported} households",
+            f"Payout recommendation: ${request.payout_recommendation_usd:,.0f}"
+        ],
+        ai_model="rule-based-fallback",
+        generated_at=datetime.utcnow().isoformat() + "Z"
+    )
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("AI_SERVICE_PORT", "8000"))

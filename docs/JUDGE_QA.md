@@ -1,126 +1,91 @@
-# Judge Q&A
+# Judge Q&A - EcoSwarm Regen
 
-## Why does this need Web3?
+## Why does this need Web3? Why not Web2?
 
-Because the pain point is shared trust across multiple parties.
+Because the trust model is the product.
 
-EcoSwarm is not just storing climate data. It coordinates operators, verifiers, and sponsors around milestone releases. That requires:
-
-- ordered proof checkpoints
-- transparent release decisions
-- low-cost repeated updates
-- auditable financial state changes
-
-That is where Hedera is functionally useful.
+In EcoSwarm, escrow release cannot happen without verifier approval. That rule is enforced by smart-contract state, not by an admin panel or editable database log. Sponsors, verifiers, and operators read the same audit trail, and no single party can rewrite the release history after the fact.
 
 ## Why Hedera specifically?
 
-- HCS is a strong fit for proof and treasury checkpoints
-- HTS-style receipts fit impact-linked financial actions
-- Hedera fees and throughput support many small updates instead of one expensive final settlement
-- the network already has strong sustainability positioning and tooling
+- Low-cost repeated transactions make milestone-heavy workflows economically realistic
+- Energy-efficient infrastructure aligns with the sustainability mission
+- Hedera is well suited to ordered audit trails, tokenized receipts, and multi-party coordination
+- The workflow is compatible with future Guardian-style MRV integration
 
-## What is the real customer?
+## What Hedera services do you actually use?
 
-The first buyer is not "everyone in sustainability."
+Seven service dimensions:
 
-The buyer is one of:
+| Service | How it is used |
+| --- | --- |
+| Smart Contract Service | Escrow registration, sponsor deposits, verifier approval, sponsor release, refund eligibility |
+| Account provisioning | Distinct Hedera accounts for sponsor, verifier, and operator |
+| HCS | Event, payout, and release checkpoints |
+| HTS fungible | Impact receipt minting and transfer |
+| HTS NFT | Shared impact certificate collection with one serial per verified release |
+| Mirror Node API | On-chain verification in the audit workspace |
+| Scheduled Transactions | Deadline reminders and recovery support only |
 
-- CSR teams funding local climate outcomes
-- climate or adaptation funds
-- municipal resilience programs
+## What is the real AI here?
+
+There are two AI layers:
+
+1. `Optimize` uses weighted impact-per-dollar logic to rank where capital should move.
+2. `Analyze` uses Gemini to explain risk, readiness, and funding recommendations in natural language.
+
+The AI is not the trust layer. It supports the payout workflow and makes its reasoning visible.
+
+## Who is the real customer?
+
+The first buyer is a CSR manager, climate fund manager, or resilience program lead who needs proof-backed milestone payouts instead of email-based grant administration.
 
 The users are:
 
-- local operators
-- verifiers
-- sponsor-side reviewers
-
-## What is the narrow launch wedge?
-
-The strongest wedge is:
-
-`verified milestone payouts for community restoration and resilience projects`
-
-That is more credible than pitching a full sustainability marketplace on day one.
-
-## How is this different from a dashboard?
-
-Dashboards observe.
-
-EcoSwarm coordinates action:
-
-- field intake becomes a payout case
-- proof quality affects release readiness
-- treasury logic ranks funding opportunities
-- sponsors see synchronized alerts
-- Hedera records the audit line
-
-## What is innovative here?
-
-The innovation is not "AI plus climate."
-
-It is turning sustainability verification into a shared payout workflow:
-
-- community-originated intake
-- milestone-backed release logic
-- synchronized sponsor / verifier / operator views
-- Hedera-backed auditability
-
-## Is this feasible beyond a hackathon?
-
-Yes, because the architecture is already split into realistic layers:
-
-- frontend product shell
-- backend event and payout pipeline
-- AI allocation service
-- Hedera-backed event and token integration
-
-The next production steps are incremental:
-
-- real proof uploads
-- sponsor approval workflow
-- one pilot verifier integration
+- local operators who submit proof and manage delivery
+- verifiers who review and approve milestones
+- sponsors who authorize capital release
 
 ## What validation do you have?
 
-Current honest answer:
+We are explicit about the stage:
 
-`This build validates the workflow and the Hedera integration, but it still needs external partner proof to move from strong MVP to pilot-ready company.`
+- MVP complete
+- pilot-ready
+- awaiting first live pilot
 
-Then immediately say:
+What we do have is strong problem validation and a specific deployment wedge. We are targeting proof-to-payout friction in climate funding, with concrete pilot wedges in India solar, India reforestation, and East Africa cleanup.
 
-`That is why the launch wedge is narrow and the next step is one operator, one verifier, and one sponsor workflow.`
+## How does this drive Hedera success?
 
-## How do you win on Success and Validation criteria?
+Each project can create:
 
-Talk about repeated network use, not one-off mints.
+- 3 Hedera accounts
+- multiple HCS checkpoints
+- smart-contract escrow activity
+- HTS receipt minting and transfer
+- an HTS NFT certificate serial
 
-- repeated proof submissions
-- repeated milestone reviews
-- repeated sponsor approvals
-- repeated Hedera event records
-- repeated receipt issuance
+At pilot scale, that becomes repeatable multi-party activity rather than one-off blockchain usage.
 
-That creates sustained platform and network activity if deployed.
+## Do you have a business model?
+
+Yes. The product includes a Lean Canvas / Business Model workspace with:
+
+- target buyer
+- GTM phases
+- pricing logic
+- pilot wedge
+- commercial expansion path
 
 ## What would you do with incubation support?
 
-- secure one pilot geography
-- onboard one verifier or NGO partner
-- productionize proof upload and policy rules
-- move from simulated cases to first funded live cases
+1. Secure one live pilot sponsor
+2. Onboard one verifier partner
+3. Move the escrow workflow from testnet MVP into the first production deployment
+4. Integrate more formal MRV policy logic
+5. Execute the first live proof-to-payout cycle
 
-## What should you not say?
+## Short Closing Line
 
-Avoid these weak answers:
-
-- "It is a platform for all sustainability stakeholders"
-- "It is an AI sustainability dashboard"
-- "Blockchain makes it transparent"
-
-Those are vague and easy to dismiss.
-
-## Strong closing line
-
-`EcoSwarm Regen is not trying to measure sustainability from a distance. It is trying to make trusted climate funding move faster in the real world.`
+`EcoSwarm Regen is not a sustainability dashboard. It is a payout operating system for climate programs, built so capital cannot move without proof.`

@@ -40,6 +40,11 @@ export class Portfolio {
     }
   }
 
+  restoreEvents(caseRegistry: EnvironmentalEvent[], eventHistory?: EnvironmentalEvent[]): void {
+    this.case_registry = [...caseRegistry];
+    this.event_history = [...(eventHistory ?? caseRegistry.slice(-10))];
+  }
+
   /**
    * Updates portfolio allocations with validation.
    * Ensures allocations sum to 100% (within 0.01% tolerance).

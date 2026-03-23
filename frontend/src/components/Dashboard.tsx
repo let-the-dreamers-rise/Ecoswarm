@@ -9,12 +9,13 @@ import AgentNetworkPage from './pages/AgentNetworkPage';
 import DeploymentBlueprintPage from './pages/DeploymentBlueprintPage';
 import ClientPortalPage from './pages/ClientPortalPage';
 import AuditTrailPage from './pages/AuditTrailPage';
+import LeanCanvasPage from './pages/LeanCanvasPage';
 
 interface DashboardProps {
   wsUrl?: string;
 }
 
-type AppPage = 'overview' | 'case' | 'operations' | 'agents' | 'blueprint' | 'client' | 'audit';
+type AppPage = 'overview' | 'case' | 'operations' | 'agents' | 'blueprint' | 'client' | 'audit' | 'business';
 
 const PAGE_ITEMS: Array<{
   id: AppPage;
@@ -55,12 +56,17 @@ const PAGE_ITEMS: Array<{
     id: 'audit',
     label: 'Audit Trail',
     description: 'Proof packets, receipts, and Hedera records'
+  },
+  {
+    id: 'business',
+    label: 'Business Model',
+    description: 'Lean Canvas, GTM strategy, and market analysis'
   }
 ];
 
 const getPageFromHash = (): AppPage => {
   const hash = window.location.hash.replace(/^#\/?/, '');
-  if (hash === 'case' || hash === 'operations' || hash === 'agents' || hash === 'blueprint' || hash === 'client' || hash === 'audit') {
+  if (hash === 'case' || hash === 'operations' || hash === 'agents' || hash === 'blueprint' || hash === 'client' || hash === 'audit' || hash === 'business') {
     return hash;
   }
   return 'overview';
@@ -187,6 +193,35 @@ const Dashboard: React.FC<DashboardProps> = ({ wsUrl = getWsUrl() }) => {
               <div className="mt-4 inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold text-emerald-200">
                 <span className={`h-2.5 w-2.5 rounded-full ${isConnected ? 'bg-emerald-400' : 'bg-rose-400'}`} />
                 {isConnected ? 'Live sync connected' : 'Disconnected'}
+              </div>
+            </div>
+
+            <div className="mt-5 rounded-3xl border border-emerald-400/15 bg-emerald-500/5 p-5">
+              <div className="text-xs uppercase tracking-[0.18em] text-emerald-200">Hedera Network Impact</div>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-white/5 px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-white">
+                    {metrics?.accounts_created ?? 0}
+                  </div>
+                  <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">Accounts<br/>Created</div>
+                </div>
+                <div className="rounded-xl bg-white/5 px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-white">{eventStream.length}</div>
+                  <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">HCS<br/>Records</div>
+                </div>
+                <div className="rounded-xl bg-white/5 px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-white">
+                    {Object.values(tokens || {}).reduce((s: number, v: any) => s + (typeof v === 'number' ? v : 0), 0)}
+                  </div>
+                  <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">HTS Tokens<br/>Minted</div>
+                </div>
+                <div className="rounded-xl bg-white/5 px-3 py-3 text-center">
+                  <div className="text-2xl font-bold text-white">7</div>
+                  <div className="mt-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">Hedera<br/>Services</div>
+                </div>
+              </div>
+              <div className="mt-3 text-[10px] leading-4 text-slate-500">
+                HCS · HTS · NFTs · Contracts · Accounts · Mirror · Scheduled
               </div>
             </div>
 
@@ -424,6 +459,10 @@ const Dashboard: React.FC<DashboardProps> = ({ wsUrl = getWsUrl() }) => {
                 tokens={tokens}
                 hederaRecords={eventStream}
               />
+            )}
+
+            {currentPage === 'business' && (
+              <LeanCanvasPage />
             )}
           </main>
         </div>

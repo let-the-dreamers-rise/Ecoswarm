@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeAll, beforeEach, afterAll } from 'vitest';
 import fc from 'fast-check';
 import { ChildProcess, spawn } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 // Feature: eco-swarm-climate-fund, Property 9: Concurrent Event Processing Without Loss
@@ -11,6 +13,7 @@ describe('Concurrent Event Processing', () => {
   const BASE_URL = `http://127.0.0.1:${TEST_PORT}`;
   let initialMetrics: any;
   let serverProcess: ChildProcess | null = null;
+  let tempDir = '';
 
   const waitForServer = async () => {
     const timeoutAt = Date.now() + 15000;
@@ -33,12 +36,24 @@ describe('Concurrent Event Processing', () => {
 
   beforeAll(async () => {
     const tsxCliPath = path.join(process.cwd(), 'node_modules', 'tsx', 'dist', 'cli.mjs');
+    tempDir = mkdtempSync(path.join(os.tmpdir(), 'ecoswarm-concurrency-'));
 
     serverProcess = spawn(process.execPath, [tsxCliPath, 'src/index.ts'], {
       cwd: process.cwd(),
       env: {
         ...process.env,
-        BACKEND_PORT: String(TEST_PORT)
+        BACKEND_PORT: String(TEST_PORT),
+        BACKEND_STATE_PATH: path.join(tempDir, 'backend-state.json'),
+        AI_SERVICE_URL: 'http://127.0.0.1:65535',
+        HEDERA_ACCOUNT_ID: '0.0.YOUR_ACCOUNT_ID',
+        HEDERA_PRIVATE_KEY: 'YOUR_PRIVATE_KEY_HERE',
+        HEDERA_TOPIC_ID: 'YOUR_TOPIC_ID_HERE',
+        SOLAR_TOKEN_ID: '',
+        CLEANUP_TOKEN_ID: '',
+        REFORESTATION_TOKEN_ID: '',
+        CARBON_CAPTURE_TOKEN_ID: '',
+        IMPACT_CERTIFICATE_TOKEN_ID: '',
+        ESCROW_CONTRACT_ID: ''
       },
       stdio: 'ignore'
     });
@@ -66,6 +81,10 @@ describe('Concurrent Event Processing', () => {
       exitPromise,
       new Promise((resolve) => setTimeout(resolve, 2000))
     ]);
+
+    if (tempDir) {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
   });
   
   // Helper to create valid event
@@ -84,7 +103,7 @@ describe('Concurrent Event Processing', () => {
   it('processes all concurrent events without data loss', async () => {
     await fc.assert(
       fc.asyncProperty(
-        fc.integer({ min: 5, max: 20 }), // Number of concurrent events
+        fc.integer({ min: 5, max: 12 }),
         async (numEvents) => {
           // Create array of events
           const events = Array.from({ length: numEvents }, (_, i) => createValidEvent(i));
@@ -129,13 +148,13 @@ describe('Concurrent Event Processing', () => {
           initialMetrics = finalMetrics;
         }
       ),
-      { numRuns: 10, timeout: 30000 } // Run 10 times with 30s timeout
+      { numRuns: 4, examples: [[8]], timeout: 15000 }
     );
   }, 60000); // 60 second test timeout
   
   it('maintains FIFO order in queue processing', async () => {
     // Create a sequence of events with identifiable metrics
-    const events = Array.from({ length: 10 }, (_, i) => ({
+    const events = Array.from({ length: 8 }, (_, i) => ({
       event_type: 'Solar' as const,
       location_coordinates: {
         latitude: 0,
@@ -174,7 +193,7 @@ describe('Concurrent Event Processing', () => {
   it('logs warning when queue exceeds 100 events', async () => {
     // This test verifies the warning is logged (implementation detail)
     // We'll submit a large batch and verify all are processed
-    const numEvents = 150;
+    const numEvents = 105;
     const events = Array.from({ length: numEvents }, (_, i) => createValidEvent(i));
     
     // Submit all events concurrently

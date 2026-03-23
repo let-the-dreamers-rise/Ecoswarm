@@ -334,8 +334,107 @@ const ClientPortalPage: React.FC<ClientPortalPageProps> = ({
           ))}
         </div>
       </section>
+
+      {/* ───── Sponsor Feedback & Validation Loop ───── */}
+      <section className="rounded-[28px] border border-violet-400/15 bg-[#0e0b18]/90 p-6 shadow-xl backdrop-blur-xl">
+        <div className="text-xs uppercase tracking-[0.18em] text-violet-200">Market Feedback Cycle</div>
+        <h2 className="mt-2 text-2xl font-semibold text-white">Sponsor Feedback & Validation Loop</h2>
+        <p className="mt-2 text-sm text-slate-400">
+          Every release triggers a feedback cycle. This is how the product improves through real market signals — not assumptions.
+        </p>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              step: '1',
+              label: 'Post-Release Survey',
+              timing: 'After each milestone release',
+              detail: 'Sponsors rate verification quality (1-5), time-to-release perception, and proof adequacy. Operators rate payout speed and clarity.',
+              color: 'border-emerald-400/15 bg-emerald-500/5'
+            },
+            {
+              step: '2',
+              label: 'Quarterly NPS',
+              timing: 'Every 90 days',
+              detail: 'Net Promoter Score survey to all active sponsors, verifiers, and operators. Track willingness to recommend, expand portfolio, or churn.',
+              color: 'border-cyan-400/15 bg-cyan-500/5'
+            },
+            {
+              step: '3',
+              label: 'Milestone Retrospective',
+              timing: 'After each project completes',
+              detail: 'Structured debrief with sponsor + operator: what proof was sufficient, what was missing, what held up release? Feed back into milestone design.',
+              color: 'border-amber-400/15 bg-amber-500/5'
+            },
+            {
+              step: '4',
+              label: 'Annual Impact Audit',
+              timing: 'Yearly',
+              detail: 'Third-party sustainability auditor reviews all completed projects, verifies NFT certificates against field outcomes, publishes public impact report.',
+              color: 'border-violet-400/15 bg-violet-500/5'
+            }
+          ].map((step) => (
+            <div key={step.step} className={`rounded-2xl border p-5 ${step.color}`}>
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-sm font-bold text-white">
+                  {step.step}
+                </div>
+                <div className="text-sm font-semibold text-white">{step.label}</div>
+              </div>
+              <div className="mt-2 text-[11px] uppercase tracking-[0.12em] text-slate-500">{step.timing}</div>
+              <div className="mt-3 text-xs leading-5 text-slate-300">{step.detail}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl border border-white/8 bg-white/5 p-5">
+            <div className="text-xs uppercase tracking-[0.12em] text-emerald-200">Current Validation Status</div>
+            <div className="mt-3 space-y-2 text-sm text-slate-300">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                Market research signal: CSR outcome-verification pain is consistently reported in ESG buyer research
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                Market research signal: climate-finance funding gaps are large enough to support a focused payout workflow wedge
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-amber-400" />
+                Product validation: MVP complete, pilot-ready, awaiting first pilot sponsor engagement
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-amber-400" />
+                Revenue validation: pricing model defined ($200-$500/project), pending first paid pilot
+              </div>
+            </div>
+          </div>
+          <div className="rounded-2xl border border-white/8 bg-white/5 p-5">
+            <div className="text-xs uppercase tracking-[0.12em] text-cyan-200">Planned Feedback Sources</div>
+            <div className="mt-3 space-y-2 text-sm text-slate-300">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">Q2 2026</span>
+                <span>3 CSR managers from Indian solar cooperatives for pilot feedback</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">Q3 2026</span>
+                <span>Sustainability auditor partnership (EY / Deloitte ESG division)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">Q4 2026</span>
+                <span>Community operator NPS from 5+ active projects in 2 geographies</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">2027</span>
+                <span>Guardian MRV methodology alignment review with Hedera sustainability team</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
 
 export default ClientPortalPage;
+

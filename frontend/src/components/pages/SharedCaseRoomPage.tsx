@@ -33,6 +33,12 @@ const milestoneTone = {
   released: 'border-cyan-400/20 bg-cyan-500/10 text-cyan-100'
 } as const;
 
+const stepTone = {
+  completed: 'border-emerald-400/15 bg-emerald-500/5 text-emerald-100',
+  failed: 'border-rose-400/15 bg-rose-500/5 text-rose-100',
+  skipped: 'border-slate-400/15 bg-slate-500/5 text-slate-300'
+} as const;
+
 const formatReadiness = (value?: ReleaseReadiness) => {
   if (!value) {
     return 'Hold';
@@ -355,8 +361,45 @@ const SharedCaseRoomPage: React.FC<SharedCaseRoomPageProps> = ({
               </div>
               <div className="mt-2 text-sm font-medium text-cyan-200">{action.actor_label}</div>
               <div className="mt-3 text-sm leading-6 text-slate-300">{action.note}</div>
+              {action.failure_reason && (
+                <div className="mt-3 rounded-2xl border border-rose-400/15 bg-rose-500/5 px-4 py-3 text-sm leading-6 text-rose-100">
+                  {action.failure_reason}
+                </div>
+              )}
               {action.transaction_id && (
                 <div className="mt-3 text-xs text-slate-400">TX: {action.transaction_id}</div>
+              )}
+              {(action.required_steps?.length || action.optional_steps?.length) && (
+                <div className="mt-4 space-y-3">
+                  {action.required_steps?.map((step) => (
+                    <div key={`${action.timestamp}-${step.key}`} className={`rounded-2xl border px-4 py-3 ${stepTone[step.status]}`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="text-sm font-semibold">{step.label}</div>
+                        <div className="text-[10px] uppercase tracking-[0.16em] opacity-80">{step.status}</div>
+                      </div>
+                      {step.detail && (
+                        <div className="mt-2 text-xs leading-5 opacity-90">{step.detail}</div>
+                      )}
+                      {step.transaction_id && (
+                        <div className="mt-2 text-[11px] opacity-80">TX: {step.transaction_id}</div>
+                      )}
+                    </div>
+                  ))}
+                  {action.optional_steps?.map((step) => (
+                    <div key={`${action.timestamp}-optional-${step.key}`} className={`rounded-2xl border px-4 py-3 ${stepTone[step.status]}`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="text-sm font-semibold">{step.label}</div>
+                        <div className="text-[10px] uppercase tracking-[0.16em] opacity-80">optional {step.status}</div>
+                      </div>
+                      {step.detail && (
+                        <div className="mt-2 text-xs leading-5 opacity-90">{step.detail}</div>
+                      )}
+                      {step.transaction_id && (
+                        <div className="mt-2 text-[11px] opacity-80">TX: {step.transaction_id}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           ))}

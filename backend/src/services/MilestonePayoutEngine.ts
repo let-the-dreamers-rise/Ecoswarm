@@ -7,6 +7,7 @@ import {
   MilestoneCheckpoint,
   MilestoneStage,
   MilestoneStatus,
+  OnChainActionStep,
   ReleaseReadiness
 } from '../types/index.js';
 
@@ -448,7 +449,11 @@ export class MilestonePayoutEngine {
   applyCaseAction(
     event: EnvironmentalEvent,
     actionType: Exclude<CaseActionType, 'proof_packet_locked'>,
-    transactionId?: string | null
+    transactionId?: string | null,
+    requiredSteps?: OnChainActionStep[],
+    optionalSteps?: OnChainActionStep[],
+    failureReason?: string,
+    milestoneIndex?: number
   ): DeploymentProfile {
     if (!event.deployment_profile) {
       throw new Error('Deployment profile not found for this event.');
@@ -497,8 +502,10 @@ export class MilestonePayoutEngine {
       actorLabel = profile.sponsor_name;
 
       let releaseTarget =
-        milestonePlan.find((milestone) => milestone.status === 'ready') ??
-        milestonePlan.find((milestone) => milestone.status === 'pending');
+        typeof milestoneIndex === 'number'
+          ? milestonePlan[milestoneIndex]
+          : milestonePlan.find((milestone) => milestone.status === 'ready') ??
+            milestonePlan.find((milestone) => milestone.status === 'pending');
 
       if (!releaseTarget) {
         releaseTarget = milestonePlan[milestonePlan.length - 1];
@@ -532,7 +539,15 @@ export class MilestonePayoutEngine {
     );
     profile.case_actions = [
       ...profile.case_actions,
-      this.createCaseAction(actionType, actorLabel, note, transactionId)
+      this.createCaseAction(
+        actionType,
+        actorLabel,
+        note,
+        transactionId,
+        requiredSteps,
+        optionalSteps,
+        failureReason
+      )
     ];
 
     return profile;
@@ -628,14 +643,20 @@ export class MilestonePayoutEngine {
     actionType: Exclude<CaseActionType, 'proof_packet_locked'>,
     actorLabel: string,
     note: string,
-    transactionId?: string | null
+    transactionId?: string | null,
+    requiredSteps?: OnChainActionStep[],
+    optionalSteps?: OnChainActionStep[],
+    failureReason?: string
   ): CaseAction {
     return {
       action_type: actionType,
       actor_label: actorLabel,
       note,
       timestamp: new Date().toISOString(),
-      transaction_id: transactionId || undefined
+      transaction_id: transactionId || undefined,
+      required_steps: requiredSteps,
+      optional_steps: optionalSteps,
+      failure_reason: failureReason
     };
   }
 

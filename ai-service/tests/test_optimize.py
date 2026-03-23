@@ -156,11 +156,9 @@ def test_optimize_impact_ratios_calculated():
     assert response.status_code == 200
     data = response.json()
     
-    # Solar average should be 90.0
-    assert abs(data["impact_per_dollar_ratios"]["Solar"] - 90.0) < 0.01
-    # River_Cleanup average should be 50.0
-    assert abs(data["impact_per_dollar_ratios"]["River_Cleanup"] - 50.0) < 0.01
+    # Weighted ratios incorporate readiness, proof confidence, and cost defaults.
+    assert abs(data["impact_per_dollar_ratios"]["Solar"] - 73.8) < 0.01
+    assert abs(data["impact_per_dollar_ratios"]["River_Cleanup"] - 41.0) < 0.01
     # Categories with no events should have 0.0
     assert data["impact_per_dollar_ratios"]["Reforestation"] == 0.0
     assert data["impact_per_dollar_ratios"]["Carbon_Capture"] == 0.0
-

@@ -17,6 +17,10 @@ describe('Hedera Integration Tests', () => {
   let hederaEventRecorder: HederaEventRecorder;
 
   beforeEach(() => {
+    process.env.HEDERA_ACCOUNT_ID = '0.0.YOUR_ACCOUNT_ID';
+    process.env.HEDERA_PRIVATE_KEY = 'YOUR_PRIVATE_KEY_HERE';
+    process.env.HEDERA_TOPIC_ID = 'YOUR_TOPIC_ID_HERE';
+    process.env.ESCROW_CONTRACT_ID = '';
     portfolio = new Portfolio();
     tokenBalances = new TokenBalances();
     aggregateMetrics = new AggregateMetrics();

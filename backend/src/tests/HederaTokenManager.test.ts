@@ -8,6 +8,9 @@ describe('HederaTokenManager', () => {
   let tokenManager: HederaTokenManager;
 
   beforeEach(() => {
+    process.env.HEDERA_ACCOUNT_ID = '0.0.YOUR_ACCOUNT_ID';
+    process.env.HEDERA_PRIVATE_KEY = 'YOUR_PRIVATE_KEY_HERE';
+    process.env.HEDERA_NETWORK = 'testnet';
     tokenBalances = new TokenBalances();
     tokenManager = new HederaTokenManager(tokenBalances);
   });

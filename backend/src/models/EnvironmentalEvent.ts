@@ -34,14 +34,14 @@ export class EnvironmentalEvent {
   deployment_profile: DeploymentProfile | null;
 
   constructor(data: SubmitEventRequest) {
-    this.id = randomUUID();
+    this.id = data.id || randomUUID();
     this.event_type = data.event_type;
     this.location_coordinates = data.location_coordinates;
     this.energy_kwh = data.energy_kwh;
     this.co2_reduction_kg = data.co2_reduction_kg;
     this.ecosystem_restoration_units = data.ecosystem_restoration_units;
     this.timestamp = new Date(data.timestamp);
-    this.impact_score = null;
+    this.impact_score = data.impact_score ?? null;
     this.project_name = data.project_name || this.getDefaultProjectName(data.event_type);
     this.community_name = data.community_name || 'Community steward network';
     this.region = data.region || 'Undisclosed region';
@@ -59,7 +59,7 @@ export class EnvironmentalEvent {
     this.local_operator_name = data.local_operator_name || 'Community operating partner';
     this.buyer_signal = data.buyer_signal || 'Mission-aligned sponsor demand';
     this.beneficiary_metric = data.beneficiary_metric || 'Verified climate impact delivered';
-    this.deployment_profile = null;
+    this.deployment_profile = data.deployment_profile || null;
   }
 
   /**

@@ -1,84 +1,117 @@
 # EcoSwarm Regen
 
-EcoSwarm Regen is a Hedera-native milestone payout treasury for community climate projects. It turns field-level project intake into sponsor-ready payout memos, ranked release queues, semi-autonomous agent operations, tokenized impact receipts, and auditable proof trails.
+Hedera-native milestone payout treasury for community climate projects.
 
-Instead of acting like a static climate dashboard, the project now behaves like a deployable climate finance workflow:
+EcoSwarm Regen is a full-stack sustainability product that turns project intake into a proof-to-payout workflow for sponsors, verifiers, and local operators. Each project becomes a milestone-backed escrow case with contract-backed release gates, HCS audit checkpoints, HTS impact receipts, shared NFT impact certificates, and AI-assisted risk analysis. The product is built for Theme 3: Sustainability in the Hedera Hello Future Apex Hackathon 2026.
 
-- local projects arrive with proof metadata, urgency, beneficiary reach, and named sponsor / verifier / operator roles
-- a payout engine converts each intake into a milestone-backed treasury case with release readiness and risk flags
-- an AI treasury model prioritizes capital using deployability, proof confidence, urgency, and cost efficiency
-- a multi-agent operations layer compresses review, authorization, settlement, and trust-building across the same case
-- HTS-style impact receipts and Hedera event records create an auditable proof-to-payout rail
+## Core Thesis
 
-## Why This Fits Apex Sustainability
+This is not a sustainability dashboard. It is a payout operating system for community climate programs.
 
-The Track 3 Sustainability brief on the Hedera Hello Future Apex Hackathon 2026 event page focuses on financial systems for ecological and social impact, on-chain verification tools, community-driven models, and marketplaces that reward regeneration. EcoSwarm Regen is built directly around those four ideas.
+The core launch wedge is:
 
-As listed on the StackUp event page on March 20, 2026:
+`Verified milestone payouts for community restoration and resilience projects.`
 
-- Sustainability is a main track in the $200,000 main-track pool
-- first place for each main track is $18,500
-- the submission deadline is March 23, 2026 at 11:59 PM ET, shown on the page as March 24, 2026 at 12:59 AM EDT
+## Selected Track
 
-## Product Thesis
+`Theme 3: Sustainability`
 
-Most sustainability demos stop at analytics. EcoSwarm Regen goes one layer deeper:
+## Core Workflow
 
-1. Community operators submit real-world climate projects with field-level proof context.
-2. The payout engine turns each intake into a milestone-backed release memo with sponsor, verifier, and operator roles.
-3. The AI treasury ranks and allocates capital toward the strongest release-ready cases.
-4. Scout, verifier, treasury, settlement, and reputation agents move the workflow instead of leaving it as a manual queue.
-5. Hedera-backed records make every important state change inspectable.
+1. Local operators submit climate projects with proof metadata, urgency, and beneficiary context.
+2. The backend converts each intake into a milestone-backed payout case.
+3. Three distinct Hedera role accounts are provisioned for the sponsor, verifier, and operator.
+4. A Hedera smart contract registers the project, deadlines, and milestone economics.
+5. Sponsor capital is deposited into escrow.
+6. HCS records event, scoring, and payout checkpoints as an immutable audit trail.
+7. AI analysis explains risk, readiness, and payout reasoning.
+8. The verifier approves milestones, the sponsor releases funds, and optional HTS receipts/NFT certificates are issued.
 
-That gives the project a clearer answer to the judge question: "Why does this need Web3, and why Hedera?"
+## Hedera Integration
 
-## Demo Story
+EcoSwarm uses seven Hedera service dimensions across the workflow:
 
-In the current build, judges can walk through a finished multi-workspace product:
+| Service | What It Does |
+| --- | --- |
+| HCS | Immutable audit trail for event and payout checkpoints |
+| HTS fungible | Impact receipt minting and transfer |
+| HTS NFT | Shared impact certificate collection, one new serial per verified release |
+| Smart Contract Service | Milestone escrow, release gating, deadline-based refund eligibility |
+| Account Service | Distinct Hedera accounts for sponsor, verifier, and operator |
+| Mirror Node API | Independent verification of messages, balances, and transactions |
+| Scheduled Transactions | Deadline reminders and recovery support, not fake unstoppable refunds |
 
-1. `Overview` frames EcoSwarm as a live sustainability treasury, not a dashboard.
-2. `Case Room` locks the app onto one shared deployment case for sponsor, verifier, and operator review.
-3. `Operations` shows intake, release queue, and treasury reasoning for the same focused case.
-4. `Agent Network` shows how semi-autonomous agents triage proof, authorize releases, and dispatch settlement.
-5. `Blueprint` shows the wedge, revenue path, Hedera moat, and 90-day pilot plan for the same case.
-6. `Client Portal` shows synchronized commitments and approval-ready alerts for sponsors.
-7. `Audit Trail` shows the filtered proof packets and Hedera records behind the case.
+## Trust Model
 
-## Hedera Fit
+Why Hedera instead of Web2:
 
-EcoSwarm Regen is designed around the strengths of Hedera:
+- Fund release is gated by smart-contract state, not admin discretion.
+- Sponsors, verifiers, and operators share an immutable HCS-backed audit trail.
+- Role separation is real: each project provisions distinct Hedera accounts.
+- Repeated low-cost transactions make milestone-heavy sustainability workflows economically viable.
 
-- Hedera Consensus Service style event recording for ordered proof and treasury checkpoints
-- Hedera Token Service style impact receipts for sustainability-linked tokenized outcomes
-- low-cost, high-throughput coordination for many small sustainability actions
-- a future path toward Guardian-style policy workflows and broader sustainability methodology tooling
+Important MVP honesty note:
+
+- Role private keys are held server-side for this testnet MVP.
+- Scheduled transactions are used for deadline reminders, not as proof of unstoppable automatic refunds.
+- The product is pilot-ready and awaiting its first live deployment.
+
+## Product Workspaces
+
+- `Overview`: product framing, Hedera integration thesis, market framing
+- `Case Room`: shared sponsor/verifier/operator workflow for a live case
+- `Operations`: intake, payout queue, treasury reasoning
+- `Agent Network`: semi-autonomous triage and workflow assistance
+- `Blueprint`: launch wedge, buyer value, deployment path, ROI
+- `Client Portal`: sponsor-facing state and feedback loop
+- `Audit Trail`: HCS records, mirror data, contract-backed status
+- `Business Model / Lean Canvas`: GTM, commercial model, and market framing
+
+## Honest Stage
+
+Current status:
+
+- MVP complete
+- Hedera testnet integration working
+- Pilot-ready
+- Awaiting first live pilot
+
+Validation framing:
+
+- strong problem validation
+- clear buyer / verifier / operator workflow
+- explicit pilot wedges
+- no fake live traction claims
+
+## Hedera Impact Framing
+
+Each project can create:
+
+- 3 Hedera role accounts
+- repeated HCS checkpoints
+- smart-contract escrow actions
+- HTS receipt mint / transfer activity
+- an HTS NFT impact certificate serial
+
+Pilot scenario framing:
+
+- 50 projects could create 150+ accounts and repeated on-chain activity across escrow, receipts, and audit checkpoints
 
 ## Architecture
 
-- `frontend/`: React + TypeScript multi-workspace product shell
-- `backend/`: Express + WebSocket event pipeline
-- `ai-service/`: FastAPI treasury optimizer
-- `backend/src/services/SimulationEngine.ts`: curated intervention scenarios for demo mode
-
-## Strongest Features In This Version
-
-- Verified milestone payout framing instead of a generic climate simulator
-- Curated project scenarios with proof hashes, verification sources, named sponsors, and local operators
-- Multi-page product shell with `Overview`, `Case Room`, `Operations`, `Agent Network`, `Blueprint`, `Client Portal`, and `Audit Trail`
-- Shared case synchronization across operator, client, and audit views
-- Live case actions for verifier review, sponsor authorization, and tranche release
-- Semi-autonomous agent workspace for scout, verifier, treasury, settlement, and reputation operations
-- HOL-ready natural-language operator console backed by live case actions and A2A endpoints
-- Deployment blueprint workspace with USP, buyer value, pricing, Hedera moat, and 90-day rollout plan
-- Milestone release board showing payout sizing, upfront release, holdbacks, and proof gates
-- Treasury committee queue showing ranked opportunities and suggested sponsor commitments
-- Hedera event stream with readable payout-memo and proof stage labels
+```text
+frontend/            -> React + TypeScript + Tailwind
+backend/             -> Express + WebSocket event pipeline
+ai-service/          -> FastAPI + Gemini-backed analysis
+backend/contracts/   -> Solidity escrow contract
+backend/scripts/     -> Hedera provisioning and deployment scripts
+```
 
 ## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - Python 3.10+
 
 ### Install
@@ -87,173 +120,60 @@ EcoSwarm Regen is designed around the strengths of Hedera:
 npm run install:all
 ```
 
-### Run Everything
+### Environment
 
-```bash
-npm run dev
+Create `.env` with:
+
+```env
+HEDERA_ACCOUNT_ID=0.0.xxxx
+HEDERA_PRIVATE_KEY=302e...
+HEDERA_NETWORK=testnet
+HEDERA_TOPIC_ID=0.0.xxxx
+SOLAR_TOKEN_ID=0.0.xxxx
+CLEANUP_TOKEN_ID=0.0.xxxx
+REFORESTATION_TOKEN_ID=0.0.xxxx
+CARBON_CAPTURE_TOKEN_ID=0.0.xxxx
+IMPACT_CERTIFICATE_TOKEN_ID=0.0.xxxx
+ESCROW_CONTRACT_ID=0.0.xxxx
+GEMINI_API_KEY=your-gemini-key
 ```
 
-This starts:
+Optional for isolated test/runtime state:
 
-- backend on `http://localhost:3000`
-- AI service on `http://localhost:8000`
-- frontend on `http://localhost:5173`
-
-### Individual Services
-
-Backend:
-
-```bash
-cd backend
-npm install
-npm run dev
+```env
+BACKEND_STATE_PATH=C:\path\to\backend-state.json
 ```
 
-AI service:
-
-```bash
-cd ai-service
-pip install -r requirements.txt
-python main.py
-```
-
-Frontend:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## Tests
-
-Run everything:
-
-```bash
-npm test
-```
-
-Run per service:
-
-```bash
-npm run test:backend
-npm run test:frontend
-```
-
-Current verification status:
-
-- frontend tests: passing
-- frontend build: passing
-- backend build: passing
-- backend test suite: has older failing tests in concurrency / state-persistence areas that are not part of the new payout-flow upgrade
-
-## Real Hedera Setup
-
-To provision a fresh HCS topic and the four HTS impact receipt tokens:
+### Provision Hedera Assets
 
 ```bash
 npm run provision:hedera --prefix backend
 ```
 
-Then place the generated IDs into the root `.env` file used by the backend runtime.
-
-## HOL Agent Registration
-
-EcoSwarm now includes a real HOL-targeted agent surface:
-
-- natural-language operator chat at `POST /agent/chat`
-- A2A agent card at `/.well-known/agent-card.json`
-- A2A endpoints at `/a2a` and `/a2a/rest`
-
-To generate a HOL quote using the current Hedera credentials and a temporary public tunnel:
+### Deploy the Escrow Contract
 
 ```bash
-$env:HOL_AGENT_PUBLIC_URL='https://<public-backend-url>'
-npm run register:hol --prefix backend -- --quote-only
+node backend/scripts/deploy-contract.mjs
 ```
 
-To attempt a full registration:
+### Run the App
 
 ```bash
-$env:HOL_AGENT_PUBLIC_URL='https://<public-backend-url>'
-npm run register:hol --prefix backend
+npm run dev
 ```
 
-Current honest status:
+### Tests
 
-- HOL auth works
-- HOL quote works
-- the public agent card works on a real public tunnel URL
-- final registration is currently blocked by intermittent `504 Gateway Timeout` responses from `registry.hashgraphonline.com`
+```bash
+npm test
+npm run test:backend
+npm run test:frontend
+```
 
-See `docs/HOL_BOUNTY_READINESS.md` for the exact go / no-go call on the bounty.
+## Submission Docs
 
-## Render Deployment
-
-The repo now includes a multi-service Render Blueprint in `render.yaml` for:
-
-- `ecoswarm-backend`
-- `ecoswarm-ai`
-- `ecoswarm-frontend`
-
-The frontend no longer depends on hardcoded localhost URLs. In production it reads:
-
-- `VITE_API_BASE_URL`
-- `VITE_WS_URL`
-
-If you deploy with Render Blueprints:
-
-1. push this repo to GitHub
-2. open the Blueprint from Render
-3. set the Hedera secrets marked `sync: false`
-4. deploy the stack
-
-The backend requires these runtime secrets to be set in Render:
-
-- `HEDERA_ACCOUNT_ID`
-- `HEDERA_PRIVATE_KEY`
-- `HEDERA_TOPIC_ID`
-- `SOLAR_TOKEN_ID`
-- `CLEANUP_TOKEN_ID`
-- `REFORESTATION_TOKEN_ID`
-- `CARBON_CAPTURE_TOKEN_ID`
-
-## Submission Help
-
-See `docs/APEX_SUSTAINABILITY_BRIEF.md` for:
-
-- a 100-word project description
-- a Track 3 framing
-- a judging-criteria mapping
-- a short demo script
-- next-step roadmap ideas
-
-See `docs/WINNER_PATTERN_RESEARCH.md` for:
-
-- recent Hedera sustainability winner patterns
-- what those winners have in common
-- how EcoSwarm Regen has been reshaped to match those patterns
-
-See `docs/AGENT_LAYER_RESEARCH.md` for:
-
-- why agents belong in this product
-- which operational bottlenecks they solve
-- what we deliberately did not fake or overclaim
-
-See `docs/HOL_BOUNTY_READINESS.md` for:
-
-- the honest HOL bounty position
-- the A2A / chat surface now in the product
-- what still blocks a final stable registration
-- why OpenClaw should still be avoided for now
-
-See `docs/INCUBATOR_READINESS_BRIEF.md` for:
-
-- the incubator-grade positioning
-- the one-sentence pitch
-- the strongest reviewer talking points
-
-See `docs/PITCH_DECK_OUTLINE.md` and `docs/JUDGE_QA.md` for:
-
-- a sharper deck structure
-- direct answers for likely hackathon and incubator judge questions
+- `docs/APEX_SUSTAINABILITY_BRIEF.md`
+- `docs/JUDGE_QA.md`
+- `docs/SUBMISSION_FORM_ANSWERS.md`
+- `docs/INCUBATOR_READINESS_BRIEF.md`
+- `docs/HOL_BOUNTY_READINESS.md`
