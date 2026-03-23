@@ -1,7 +1,6 @@
 """Infrastructure tests for AI service"""
-import pytest
 from fastapi.testclient import TestClient
-from main import app
+from main import app, mean
 
 client = TestClient(app)
 
@@ -16,10 +15,7 @@ def test_fastapi_app_exists():
     assert app is not None
     assert app.title == "EcoSwarm AI Portfolio Optimizer"
 
-def test_numpy_available():
-    """Test that NumPy is available for calculations"""
-    import numpy as np
-    assert np is not None
-    # Test basic numpy operation
-    arr = np.array([1, 2, 3])
-    assert arr.sum() == 6
+def test_mean_helper():
+    """Test that the lightweight averaging helper works for optimizer calculations"""
+    assert mean([1, 2, 3]) == 2
+    assert mean([]) == 0.0

@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict, List, Any
-import numpy as np
 import os
 from dotenv import load_dotenv
 
@@ -41,6 +40,10 @@ READINESS_MULTIPLIERS = {
     "review": 1.04,
     "release": 1.18,
 }
+
+
+def mean(values: List[float]) -> float:
+    return (sum(values) / len(values)) if values else 0.0
 
 def calculate_weighted_impact(event: Dict[str, Any]) -> float:
     impact_score = float(event.get("impact_score") or 0.0)
@@ -96,7 +99,7 @@ async def optimize(request: OptimizeRequest) -> OptimizeResponse:
     # Calculate average impact per category (impact-per-dollar ratio)
     impact_per_dollar_ratios: Dict[str, float] = {}
     for category, scores in category_scores.items():
-        impact_per_dollar_ratios[category] = np.mean(scores) if scores else 0.0
+        impact_per_dollar_ratios[category] = mean(scores)
     
     # Ensure all categories from current allocation are represented
     for category in request.current_allocation.keys():
@@ -115,7 +118,7 @@ async def optimize(request: OptimizeRequest) -> OptimizeResponse:
     
     # Find max and average impact ratios
     max_ratio = max(impact_per_dollar_ratios.values())
-    avg_ratio = np.mean(list(impact_per_dollar_ratios.values()))
+    avg_ratio = mean(list(impact_per_dollar_ratios.values()))
     
     # Check if max is at least 20% higher than average
     threshold = avg_ratio * 1.2
