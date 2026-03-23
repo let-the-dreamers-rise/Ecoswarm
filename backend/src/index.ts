@@ -295,7 +295,7 @@ function normalizeServiceUrl(rawUrl: string): string {
     return rawUrl.replace(/\/+$/, '');
   }
 
-  return `https://${rawUrl.replace(/\/+$/, '')}`;
+  return `http://${rawUrl.replace(/\/+$/, '')}`;
 }
 
 function createEventPayload(event: EnvironmentalEvent) {

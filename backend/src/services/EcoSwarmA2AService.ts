@@ -59,7 +59,16 @@ export interface MountedA2AAgent {
 }
 
 function normalizeBaseUrl(baseUrl: string): string {
-  return baseUrl.replace(/\/+$/, '');
+  const trimmed = baseUrl.replace(/\/+$/, '');
+  if (/^https?:\/\//.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (/^(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(trimmed)) {
+    return `http://${trimmed}`;
+  }
+
+  return `https://${trimmed}`;
 }
 
 function buildAgentCard(baseUrl: string): AgentCard {
