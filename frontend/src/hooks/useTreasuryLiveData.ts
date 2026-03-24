@@ -23,6 +23,13 @@ interface PersistedDashboardState {
   selected_case_id?: string | null;
 }
 
+interface TopicMessageResponse {
+  messages?: Array<{
+    consensus_timestamp: string;
+    message: string;
+  }>;
+}
+
 const STORAGE_KEY = 'ecoswarm_state';
 const API_BASE_URL = getApiBaseUrl();
 const readinessRank = {
@@ -137,6 +144,28 @@ const normalizeRecord = (payload: any): HederaEventRecord | null => {
   return null;
 };
 
+const normalizeTopicMessageRecord = (topicMessage: { consensus_timestamp: string; message: string }): HederaEventRecord | null => {
+  try {
+    const parsed = JSON.parse(topicMessage.message);
+
+    if (!parsed?.event_type) {
+      return null;
+    }
+
+    return {
+      event_type: parsed.event_type,
+      timestamp: parsed.timestamp ?? new Date(Number(topicMessage.consensus_timestamp.split('.')[0]) * 1000).toISOString(),
+      payload: parsed.payload ?? parsed,
+      transaction_id: parsed.transaction_id ?? parsed.payload?.transaction_id,
+      project_name: parsed.project_name ?? parsed.payload?.project_name,
+      stage_label: parsed.stage_label,
+      summary: parsed.summary
+    };
+  } catch {
+    return null;
+  }
+};
+
 export function useTreasuryLiveData(wsUrl: string) {
   const [isConnected, setIsConnected] = useState(false);
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
@@ -240,10 +269,11 @@ export function useTreasuryLiveData(wsUrl: string) {
 
   const fetchInitialData = async () => {
     try {
-      const [portfolioRes, metricsRes, tokensRes] = await Promise.all([
+      const [portfolioRes, metricsRes, tokensRes, topicMessagesRes] = await Promise.all([
         fetch(`${API_BASE_URL}/portfolio`),
         fetch(`${API_BASE_URL}/metrics`),
-        fetch(`${API_BASE_URL}/tokens`)
+        fetch(`${API_BASE_URL}/tokens`),
+        fetch(`${API_BASE_URL}/hedera/topic-messages`)
       ]);
 
       if (portfolioRes.ok) {
@@ -254,6 +284,17 @@ export function useTreasuryLiveData(wsUrl: string) {
       }
       if (tokensRes.ok) {
         setTokens(await tokensRes.json());
+      }
+      if (topicMessagesRes.ok) {
+        const topicMessagesPayload = await topicMessagesRes.json() as TopicMessageResponse;
+        const hydratedRecords = (topicMessagesPayload.messages ?? [])
+          .map(normalizeTopicMessageRecord)
+          .filter((record): record is HederaEventRecord => record !== null)
+          .slice(0, 20);
+
+        if (hydratedRecords.length > 0) {
+          setEventStream((previous) => (previous.length > 0 ? previous : hydratedRecords));
+        }
       }
     } catch (error) {
       console.error('Failed to fetch initial data:', error);

@@ -82,6 +82,12 @@ describe('Dashboard Component', () => {
           json: () => Promise.resolve(mockTokens)
         } as Response);
       }
+      if (url.includes('/hedera/topic-messages')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ messages: [] })
+        } as Response);
+      }
       return Promise.reject(new Error('Unknown URL'));
     }) as any;
   });
@@ -215,6 +221,7 @@ describe('Dashboard Component', () => {
       expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/portfolio');
       expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/metrics');
       expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/tokens');
+      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/hedera/topic-messages');
     });
   });
 

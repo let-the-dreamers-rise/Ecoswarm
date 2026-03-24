@@ -1562,6 +1562,12 @@ app.get('/tokens', (_req, res) => {
   res.json(getTokenSnapshot());
 });
 
+app.get('/hedera/records', (_req, res) => {
+  res.json({
+    records: hederaRecords.slice(0, 20)
+  });
+});
+
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Smart Contract Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 app.post('/contracts/projects', async (req, res) => {

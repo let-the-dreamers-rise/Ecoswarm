@@ -87,6 +87,12 @@ describe('Frontend State Persistence', () => {
           json: () => Promise.resolve(mockTokens)
         } as Response);
       }
+      if (url.includes('/hedera/topic-messages')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ messages: [] })
+        } as Response);
+      }
       return Promise.reject(new Error('Unknown URL'));
     }) as any;
   });
@@ -170,6 +176,12 @@ describe('Frontend State Persistence', () => {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve(mockState.token_balances)
+        } as Response);
+      }
+      if (url.includes('/hedera/topic-messages')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ messages: [] })
         } as Response);
       }
       return Promise.reject(new Error('Unknown URL'));

@@ -56,6 +56,12 @@ describe('Demo Mode Controls and System Health Display', () => {
           })
         });
       }
+      if (url.includes('/hedera/topic-messages')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ messages: [] })
+        });
+      }
       return Promise.resolve({ ok: false });
     }) as any;
   });
