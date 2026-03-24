@@ -218,10 +218,17 @@ describe('Dashboard Component', () => {
     render(<Dashboard />);
     
     await waitFor(() => {
-      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/portfolio');
-      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/metrics');
-      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/tokens');
-      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/hedera/topic-messages');
+      const noCacheRequest = {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      };
+
+      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/portfolio', noCacheRequest);
+      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/metrics', noCacheRequest);
+      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/tokens', noCacheRequest);
+      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/hedera/topic-messages', noCacheRequest);
     });
   });
 

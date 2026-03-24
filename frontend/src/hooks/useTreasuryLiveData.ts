@@ -32,6 +32,7 @@ interface TopicMessageResponse {
 
 const STORAGE_KEY = 'ecoswarm_state';
 const API_BASE_URL = getApiBaseUrl();
+const TOPIC_REFRESH_INTERVAL_MS = 30_000;
 const readinessRank = {
   hold: 0,
   review: 1,
@@ -166,6 +167,43 @@ const normalizeTopicMessageRecord = (topicMessage: { consensus_timestamp: string
   }
 };
 
+const getRecordIdentity = (record: HederaEventRecord): string => {
+  const transactionId = record.transaction_id ?? record.payload?.transaction_id;
+  const eventId = record.payload?.event_id;
+  const projectName = record.project_name ?? record.payload?.project_name ?? '';
+
+  return [
+    transactionId ?? '',
+    eventId ?? '',
+    record.event_type,
+    projectName,
+    record.timestamp
+  ].join('::');
+};
+
+const mergeRecords = (
+  existing: HederaEventRecord[],
+  incoming: HederaEventRecord[]
+): HederaEventRecord[] => {
+  const recordMap = new Map<string, HederaEventRecord>();
+
+  [...incoming, ...existing].forEach((record) => {
+    recordMap.set(getRecordIdentity(record), record);
+  });
+
+  return [...recordMap.values()]
+    .sort((left, right) => new Date(right.timestamp).getTime() - new Date(left.timestamp).getTime())
+    .slice(0, 20);
+};
+
+const fetchLiveJson = async (path: string) =>
+  fetch(`${API_BASE_URL}${path}`, {
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache'
+    }
+  });
+
 export function useTreasuryLiveData(wsUrl: string) {
   const [isConnected, setIsConnected] = useState(false);
   const [portfolio, setPortfolio] = useState<PortfolioResponse | null>(null);
@@ -242,11 +280,13 @@ export function useTreasuryLiveData(wsUrl: string) {
     };
 
     fetchInitialData();
+    const refreshTimer = window.setInterval(fetchInitialData, TOPIC_REFRESH_INTERVAL_MS);
 
     return () => {
       if (notificationTimeoutRef.current !== null) {
         window.clearTimeout(notificationTimeoutRef.current);
       }
+      window.clearInterval(refreshTimer);
       ws.close();
     };
   }, [wsUrl]);
@@ -270,10 +310,10 @@ export function useTreasuryLiveData(wsUrl: string) {
   const fetchInitialData = async () => {
     try {
       const [portfolioRes, metricsRes, tokensRes, topicMessagesRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/portfolio`),
-        fetch(`${API_BASE_URL}/metrics`),
-        fetch(`${API_BASE_URL}/tokens`),
-        fetch(`${API_BASE_URL}/hedera/topic-messages`)
+        fetchLiveJson('/portfolio'),
+        fetchLiveJson('/metrics'),
+        fetchLiveJson('/tokens'),
+        fetchLiveJson('/hedera/topic-messages')
       ]);
 
       if (portfolioRes.ok) {
@@ -293,7 +333,7 @@ export function useTreasuryLiveData(wsUrl: string) {
           .slice(0, 20);
 
         if (hydratedRecords.length > 0) {
-          setEventStream((previous) => (previous.length > 0 ? previous : hydratedRecords));
+          setEventStream((previous) => mergeRecords(previous, hydratedRecords));
         }
       }
     } catch (error) {

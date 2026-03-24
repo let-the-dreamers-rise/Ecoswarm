@@ -228,4 +228,71 @@ describe('Frontend State Persistence', () => {
       expect(screen.getByText('Starting fresh session')).toBeInTheDocument();
     }, { timeout: 3000 });
   });
+
+  it('should merge fresher Hedera topic activity over persisted browser state', async () => {
+    const staleState = {
+      portfolio: mockPortfolio,
+      metrics: mockMetrics,
+      token_balances: mockTokens,
+      event_stream: [
+        {
+          event_type: 'impact_score_calculated',
+          timestamp: '2026-03-24T01:00:00.000Z',
+          project_name: 'Older persisted project',
+          payload: { project_name: 'Older persisted project' }
+        }
+      ]
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(staleState));
+
+    globalThis.fetch = vi.fn((input: string | URL | Request) => {
+      const url = input.toString();
+      if (url.includes('/portfolio')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockPortfolio)
+        } as Response);
+      }
+      if (url.includes('/metrics')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockMetrics)
+        } as Response);
+      }
+      if (url.includes('/tokens')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockTokens)
+        } as Response);
+      }
+      if (url.includes('/hedera/topic-messages')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({
+            messages: [
+              {
+                consensus_timestamp: '1774318067.472367051',
+                message: JSON.stringify({
+                  event_type: 'impact_verified',
+                  timestamp: '2026-03-24T02:07:47.355Z',
+                  project_name: 'Fresh Hedera project',
+                  payload: {
+                    project_name: 'Fresh Hedera project'
+                  }
+                })
+              }
+            ]
+          })
+        } as Response);
+      }
+      return Promise.reject(new Error('Unknown URL'));
+    }) as any;
+
+    render(<Dashboard wsUrl="ws://localhost:3000" />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Fresh Hedera project').length).toBeGreaterThan(0);
+    }, { timeout: 3000 });
+  });
 });
