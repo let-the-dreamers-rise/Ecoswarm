@@ -57,12 +57,12 @@ describe('Dashboard Component', () => {
 
   beforeEach(() => {
     // Mock WebSocket
-    originalWebSocket = global.WebSocket;
-    global.WebSocket = MockWebSocket as any;
+    originalWebSocket = globalThis.WebSocket;
+    globalThis.WebSocket = MockWebSocket as any;
 
     // Mock fetch
-    originalFetch = global.fetch;
-    global.fetch = vi.fn((input: string | URL | Request) => {
+    originalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn((input: string | URL | Request) => {
       const url = input.toString();
       if (url.includes('/portfolio')) {
         return Promise.resolve({
@@ -87,8 +87,8 @@ describe('Dashboard Component', () => {
   });
 
   afterEach(() => {
-    global.WebSocket = originalWebSocket;
-    global.fetch = originalFetch;
+    globalThis.WebSocket = originalWebSocket;
+    globalThis.fetch = originalFetch;
     vi.clearAllMocks();
   });
 
@@ -177,7 +177,7 @@ describe('Dashboard Component', () => {
     localStorage.clear();
     
     // Mock fetch to delay
-    global.fetch = vi.fn(() => new Promise(() => {}));
+    globalThis.fetch = vi.fn(() => new Promise(() => {}));
     
     render(<Dashboard />);
     
@@ -200,7 +200,7 @@ describe('Dashboard Component', () => {
     });
     
     // Simulate disconnection
-    const ws = (global.WebSocket as any).mock?.results?.[0]?.value;
+    const ws = (globalThis.WebSocket as any).mock?.results?.[0]?.value;
     if (ws && ws.onclose) {
       ws.onclose();
     }
@@ -212,9 +212,9 @@ describe('Dashboard Component', () => {
     render(<Dashboard />);
     
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/portfolio');
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/metrics');
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/tokens');
+      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/portfolio');
+      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/metrics');
+      expect(globalThis.fetch).toHaveBeenCalledWith('http://localhost:3000/tokens');
     });
   });
 

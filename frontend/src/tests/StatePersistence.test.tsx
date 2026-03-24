@@ -62,12 +62,12 @@ describe('Frontend State Persistence', () => {
     vi.clearAllMocks();
 
     // Mock WebSocket
-    originalWebSocket = global.WebSocket;
-    global.WebSocket = MockWebSocket as any;
+    originalWebSocket = globalThis.WebSocket;
+    globalThis.WebSocket = MockWebSocket as any;
 
     // Mock fetch
-    originalFetch = global.fetch;
-    global.fetch = vi.fn((input: string | URL | Request) => {
+    originalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn((input: string | URL | Request) => {
       const url = input.toString();
       if (url.includes('/portfolio')) {
         return Promise.resolve({
@@ -92,8 +92,8 @@ describe('Frontend State Persistence', () => {
   });
 
   afterEach(() => {
-    global.WebSocket = originalWebSocket;
-    global.fetch = originalFetch;
+    globalThis.WebSocket = originalWebSocket;
+    globalThis.fetch = originalFetch;
     localStorage.clear();
   });
 
@@ -102,7 +102,7 @@ describe('Frontend State Persistence', () => {
 
     // Wait for component to mount and fetch initial data
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalled();
+      expect(globalThis.fetch).toHaveBeenCalled();
     });
 
     // Wait for state to be persisted
@@ -152,7 +152,7 @@ describe('Frontend State Persistence', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(mockState));
 
     // Mock fetch to return the persisted state values to avoid overwriting
-    global.fetch = vi.fn((input: string | URL | Request) => {
+    globalThis.fetch = vi.fn((input: string | URL | Request) => {
       const url = input.toString();
       if (url.includes('/portfolio')) {
         return Promise.resolve({

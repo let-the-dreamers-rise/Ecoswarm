@@ -51,7 +51,7 @@ Instead:
 
 Before you hit record:
 
-1. Open the live frontend: [ecoswarm-regen-frontend-oxl5l4rpj-ashwin-goyals-projects.vercel.app](https://ecoswarm-regen-frontend-oxl5l4rpj-ashwin-goyals-projects.vercel.app)
+1. Open the live frontend: [ecoswarm-regen-frontend.vercel.app](https://ecoswarm-regen-frontend.vercel.app)
 2. Make sure the left sidebar says `Live sync connected`
 3. If no cases are visible, click `Start Simulation` in the top-right scenario panel
 4. Wait until you see `Demo Mode Active`

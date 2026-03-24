@@ -8,7 +8,7 @@ This project was built for **Theme 3: Sustainability** in the **Hedera Hello Fut
 
 ## Live App
 
-- Frontend: [ecoswarm-regen-frontend-oxl5l4rpj-ashwin-goyals-projects.vercel.app](https://ecoswarm-regen-frontend-oxl5l4rpj-ashwin-goyals-projects.vercel.app)
+- Frontend: [ecoswarm-regen-frontend.vercel.app](https://ecoswarm-regen-frontend.vercel.app)
 - Backend API: [d15dx42vxcv7zo.cloudfront.net](https://d15dx42vxcv7zo.cloudfront.net/health)
 - AI service: [ecoswarm-ai-live-dreamersrise.us-east-1.elasticbeanstalk.com](http://ecoswarm-ai-live-dreamersrise.us-east-1.elasticbeanstalk.com/health)
 

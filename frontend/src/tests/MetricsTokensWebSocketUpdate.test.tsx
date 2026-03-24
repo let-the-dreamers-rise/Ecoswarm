@@ -43,7 +43,7 @@ describe('Metrics and Token Balances WebSocket Updates', () => {
 
   beforeEach(() => {
     // Mock fetch for initial data
-    global.fetch = vi.fn((url: string | URL | Request) => {
+    globalThis.fetch = vi.fn((url: string | URL | Request) => {
       const urlString = url.toString();
       if (urlString.includes('/portfolio')) {
         return Promise.resolve({
@@ -85,7 +85,7 @@ describe('Metrics and Token Balances WebSocket Updates', () => {
     }) as any;
 
     // Mock WebSocket
-    global.WebSocket = vi.fn((url: string) => {
+    globalThis.WebSocket = vi.fn((url: string) => {
       mockWs = new MockWebSocket(url);
       return mockWs as any;
     }) as any;

@@ -21,10 +21,10 @@ describe('Demo Mode Controls and System Health Display', () => {
       removeEventListener: vi.fn(),
     };
 
-    global.WebSocket = vi.fn(() => mockWebSocket) as any;
+    globalThis.WebSocket = vi.fn(() => mockWebSocket) as any;
 
     // Mock fetch for initial data
-    global.fetch = vi.fn((url: string) => {
+    globalThis.fetch = vi.fn((url: string) => {
       if (url.includes('/portfolio')) {
         return Promise.resolve({
           ok: true,
