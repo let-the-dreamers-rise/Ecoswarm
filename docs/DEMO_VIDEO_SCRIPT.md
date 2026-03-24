@@ -1,137 +1,251 @@
 # EcoSwarm Regen Demo Video Script
 
-Target length: **4 minutes 15 seconds to 4 minutes 45 seconds**
+Target length: **4 minutes 20 seconds to 4 minutes 50 seconds**
 
-Tone: calm, sharp, founder-like. Do not rush. Let the product feel real.
+Goal: make the video feel like a **real company demo**, not a hackathon screen recording.
 
-Core tagline:
+Positioning:
 
-`Capital should not move without proof.`
+- `Capital should not move without proof.`
+- `EcoSwarm Regen is not a sustainability dashboard. It is a payout operating system for climate programs.`
 
-Backup tagline:
+## What This Video Must Achieve
 
-`EcoSwarm Regen is not a sustainability dashboard. It is a payout operating system for climate programs.`
+By the end of the demo, a judge should believe four things:
 
-## Recording Structure
+1. this is solving a real climate-finance bottleneck
+2. this is deeply aligned with Hedera
+3. this is a real product, not a concept mockup
+4. this could become a pilot-ready venture after the hackathon
 
-### 0:00 - 0:20 | Hook
+## Recording Rules
+
+- Do not start with `Hi, my name is...`
+- Start on the strongest product frame immediately
+- Keep the cursor movement clean and intentional
+- Never oversell traction
+- Say `pilot-ready` instead of pretending you have live commercial customers
+- When you mention Hedera, be specific: `HCS`, `HTS`, `smart contracts`, `accounts`, `mirror node`, `scheduled transactions`
+- Speak slower than you think you need to
+
+## Opening Hook Options
+
+Pick one and commit to it.
+
+### Hook A
+
+`Climate funding does not usually fail because people do not care. It fails because capital cannot move with trust.`
+
+### Hook B
+
+`Community climate projects do the work, but funding still gets stuck between proof and payout.`
+
+### Hook C
+
+`Capital should not move without proof. EcoSwarm Regen makes that possible.`
+
+## The Archdemon Version
+
+This is the recommended full script.
+
+### 0:00 - 0:20 | Cold Open
 
 **Show**
 
-- Product landing state or best dashboard overview
+- Best Overview frame
+- strong product state, no idle loading
 
 **Say**
 
-`Climate funding often breaks between proof and payout. Operators collect evidence, verifiers review it, and sponsors still hesitate to release capital because there is no shared release truth. EcoSwarm Regen fixes that. It is a Hedera-native payout operating system for community climate projects.`
+`Climate funding does not usually fail because people do not care. It fails because capital cannot move with trust. Operators collect proof, verifiers review it, sponsors still hesitate, and money gets stuck between evidence and release. EcoSwarm Regen fixes that.`
 
-### 0:20 - 0:45 | The Wedge
+### 0:20 - 0:38 | Thesis
 
 **Show**
 
-- Overview page
-- quick highlight of the core thesis area
+- Stay on Overview
+- lightly pan to the core value framing
 
 **Say**
 
-`We focused on one launch wedge: verified milestone payouts for community restoration and resilience projects. Instead of building another sustainability dashboard, we built the workflow that decides when capital should actually move.`
+`EcoSwarm Regen is a Hedera-native payout operating system for community climate projects. It is not a sustainability dashboard. It is the workflow that decides when climate capital should actually move.`
 
-### 0:45 - 1:20 | Product Structure
+### 0:38 - 1:00 | The Wedge
 
 **Show**
 
-- Quick sweep through navigation: Overview, Case Room, Operations, Client Portal, Audit Trail, Agent Network, Blueprint, Business Model
+- Overview
+- one quick highlight of project categories or use-case section
 
 **Say**
 
-`EcoSwarm is a full operating system, not a single-page demo. Each workspace supports a real deployment workflow: case coordination, sponsor visibility, auditability, agent-assisted operations, deployment planning, and commercial readiness.`
+`We focused on one launch wedge: verified milestone payouts for community restoration and resilience projects. That includes use cases like reforestation, cleanup, community solar resilience, and carbon capture programs where proof has to trigger payout.`
 
-### 1:20 - 2:00 | Case Intake and Readiness
+### 1:00 - 1:28 | Product Scope
 
 **Show**
 
-- Operations or Case Room
-- highlight a project case, proof fields, readiness summary, milestone structure
+- Smooth navigation across pages:
+  - Overview
+  - Case Room
+  - Operations
+  - Client Portal
+  - Audit Trail
+  - Agent Network
+  - Blueprint
+  - Business Model
 
 **Say**
 
-`Here, a local operator submits a project with proof metadata, urgency, and beneficiary context. EcoSwarm turns that intake into a milestone-backed payout case. The system provisions distinct sponsor, verifier, and operator accounts, scores readiness, and prepares the project for review.`
+`This is a full operating system, not a one-page demo. Each workspace supports a real deployment workflow: case coordination, sponsor visibility, auditability, agent-assisted operations, launch planning, and commercial readiness.`
 
-### 2:00 - 2:35 | Verifier and Sponsor Flow
+### 1:28 - 2:00 | Intake to Structured Case
+
+**Show**
+
+- Operations page or Case Room
+- highlight proof fields, readiness summary, milestone setup, status blocks
+
+**Say**
+
+`Here, a local operator submits a project with proof metadata, urgency, and beneficiary context. EcoSwarm converts that intake into a milestone-backed payout case, provisions distinct sponsor, verifier, and operator accounts, and prepares the project for release review.`
+
+### 2:00 - 2:30 | Verifier and Sponsor Flow
 
 **Show**
 
 - Case Room actions
-- verifier review state
+- verifier approval state
 - sponsor authorization state
 
 **Say**
 
-`The verifier reviews milestone evidence and confirms readiness. The sponsor then authorizes tranche release only when the case is complete. This replaces fragmented spreadsheets and email approvals with one shared release workflow.`
+`Now the verifier reviews milestone evidence and confirms readiness. The sponsor then authorizes tranche release only when the case is complete. This replaces fragmented spreadsheets, manual approvals, and disconnected status updates with one shared release truth.`
 
-### 2:35 - 3:15 | Hedera Audit and Payout Proof
+### 2:30 - 3:12 | Why Hedera Matters
 
 **Show**
 
 - Audit Trail page
-- transaction IDs
-- receipts / certificates if visible
+- mirror state
+- tx IDs
+- contract status if visible
 
 **Say**
 
-`This is where Hedera becomes essential. EcoSwarm records ordered audit checkpoints through HCS, uses smart contracts for milestone escrow and release gating, issues HTS impact receipts, and mints NFT impact certificates for verified releases. These are real Hedera testnet actions, not mocked claims.`
+`This is where Hedera becomes essential. EcoSwarm uses HCS for ordered audit checkpoints, smart contracts for escrow and release gating, HTS fungible tokens for impact receipts, HTS NFTs for impact certificates, distinct Hedera accounts for each project role, mirror node verification for independent auditability, and scheduled transactions for deadline support.`
 
-### 3:15 - 3:45 | Agent Layer
+`These are real Hedera-backed actions executed by the app, not mocked claims.`
+
+### 3:12 - 3:35 | Proof Beat
+
+**Show**
+
+- zoom or hold on transaction IDs
+- if possible, show one clean sequence of proof
+
+**Say**
+
+`In this release flow, EcoSwarm executed real contract approval, real contract release, a real HCS checkpoint, a real HTS transfer, and a real NFT mint. The trust model is not presentation-deep. It is built into the workflow itself.`
+
+### 3:35 - 3:58 | Agent Layer
 
 **Show**
 
 - Agent Network page
-- case triage / operational assistance
+- triage / operational assistance
 
 **Say**
 
-`We also added a semi-autonomous agent layer to help with case triage, readiness explanation, and workflow coordination. The point is not generic AI chat. The point is reducing operational friction in climate payout workflows.`
+`We also added a semi-autonomous agent layer to reduce coordination friction. The agent helps with case triage, readiness explanation, and workflow assistance. This is not generic AI chat. It is AI applied to one hard operational problem: getting climate funding release-ready faster.`
 
-### 3:45 - 4:10 | Deployment and Market Readiness
+### 3:58 - 4:22 | Deployment and Business Readiness
 
 **Show**
 
 - Blueprint page
 - Business Model page
-- maybe one GTM or pilot section
+- one strong buyer / GTM section
 
 **Say**
 
-`EcoSwarm is designed to be deployable. The first buyers are CSR teams, climate funds, NGOs, and resilience programs that need trusted milestone disbursement. The first beachhead is narrow by design: community restoration and resilience projects where proof must trigger payout.`
+`EcoSwarm is built to be deployable. The first buyers are CSR teams, climate funds, NGOs, and resilience programs that need trusted milestone disbursement. The go-to-market is intentionally narrow: win one pilot, prove one sponsor-verifier-operator loop, and expand through repeated deployments.`
 
-### 4:10 - 4:35 | Close
+### 4:22 - 4:40 | Why This Can Become a Real Venture
 
 **Show**
 
-- Return to strongest product frame or overview
+- strongest product frame
+- maybe back to Overview or Blueprint
 
 **Say**
 
-`EcoSwarm Regen is not just measuring climate work. It governs when climate capital moves. By combining real Hedera infrastructure, a focused market wedge, and a deployable product workflow, EcoSwarm turns fragmented climate reporting into trusted milestone payouts.`
+`What makes EcoSwarm strong is not just that it visualizes climate work. It governs when climate capital moves. That is the gap between reporting and real-world execution, and that is why this can grow from a hackathon project into real deployment.`
 
-### 4:35 - 4:45 | Final Line
+### 4:40 - 4:50 | Final Close
+
+**Show**
+
+- clean hero frame
+- no cursor movement
 
 **Say**
 
-`Capital should move when proof is ready. EcoSwarm makes that possible.`
+`Capital should move when proof is ready. EcoSwarm Regen makes that possible.`
 
-## Delivery Tips
+## Teleprompter Version
 
-- Start calm, not loud.
-- Keep every sentence short.
-- Pause briefly before saying the tagline.
-- Do not oversell traction.
-- Say `pilot-ready` instead of pretending to have production customers.
-- When you mention Hedera, sound specific: `HCS`, `HTS`, `smart contracts`, `accounts`, `mirror node`, `scheduled transactions`.
+Use this if you want a clean read with minimal improvisation.
 
-## Strong One-Liners You Can Reuse
+`Climate funding does not usually fail because people do not care. It fails because capital cannot move with trust. Operators collect proof, verifiers review it, sponsors still hesitate, and money gets stuck between evidence and release. EcoSwarm Regen fixes that.`
+
+`EcoSwarm Regen is a Hedera-native payout operating system for community climate projects. It is not a sustainability dashboard. It is the workflow that decides when climate capital should actually move.`
+
+`We focused on one launch wedge: verified milestone payouts for community restoration and resilience projects. That includes use cases like reforestation, cleanup, community solar resilience, and carbon capture programs where proof has to trigger payout.`
+
+`This is a full operating system, not a one-page demo. Each workspace supports a real deployment workflow: case coordination, sponsor visibility, auditability, agent-assisted operations, launch planning, and commercial readiness.`
+
+`Here, a local operator submits a project with proof metadata, urgency, and beneficiary context. EcoSwarm converts that intake into a milestone-backed payout case, provisions distinct sponsor, verifier, and operator accounts, and prepares the project for release review.`
+
+`The verifier reviews milestone evidence and confirms readiness. The sponsor then authorizes tranche release only when the case is complete. This replaces fragmented spreadsheets, manual approvals, and disconnected status updates with one shared release truth.`
+
+`This is where Hedera becomes essential. EcoSwarm uses HCS for ordered audit checkpoints, smart contracts for escrow and release gating, HTS fungible tokens for impact receipts, HTS NFTs for impact certificates, distinct Hedera accounts for each project role, mirror node verification for independent auditability, and scheduled transactions for deadline support.`
+
+`These are real Hedera-backed actions executed by the app, not mocked claims. In this release flow, EcoSwarm executed real contract approval, real contract release, a real HCS checkpoint, a real HTS transfer, and a real NFT mint. The trust model is not presentation-deep. It is built into the workflow itself.`
+
+`We also added a semi-autonomous agent layer to reduce coordination friction. The agent helps with case triage, readiness explanation, and workflow assistance. This is not generic AI chat. It is AI applied to one hard operational problem: getting climate funding release-ready faster.`
+
+`EcoSwarm is built to be deployable. The first buyers are CSR teams, climate funds, NGOs, and resilience programs that need trusted milestone disbursement. The go-to-market is intentionally narrow: win one pilot, prove one sponsor-verifier-operator loop, and expand through repeated deployments.`
+
+`What makes EcoSwarm strong is not just that it visualizes climate work. It governs when climate capital moves. That is the gap between reporting and real-world execution, and that is why this can grow from a hackathon project into real deployment.`
+
+`Capital should move when proof is ready. EcoSwarm Regen makes that possible.`
+
+## Best On-Screen Sequence
+
+If you only have one take, use this order:
+
+1. Overview
+2. Operations
+3. Case Room
+4. Audit Trail
+5. Agent Network
+6. Blueprint
+7. Business Model
+8. Overview close
+
+## Best One-Liners
 
 - `The trust model is the product.`
 - `We are not selling climate analytics. We are selling trusted payout execution.`
 - `This is not a dashboard. It is a payout operating system.`
 - `EcoSwarm turns proof into release readiness.`
 - `Climate funding should not stall in spreadsheets.`
+- `This is where proof becomes payout.`
+
+## If You Need a Shorter Emergency Cut
+
+Use this 20-second ending if time runs long:
+
+`EcoSwarm Regen is a Hedera-native payout operating system for climate projects. It turns fragmented proof into trusted milestone release using real smart contracts, real audit checkpoints, and real on-chain actions. Capital should move when proof is ready. EcoSwarm makes that possible.`
+
